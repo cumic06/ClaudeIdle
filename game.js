@@ -5,7 +5,9 @@ const PET_SPRITE = 'assets/sprites/pet.png';
 const ACCESSORIES = [
   { id: 'none',       name: '맨머리 (기본)',            unlockLevel: 1,  overlay: null },
   { id: 'glasses',    name: '개발자 선글라스',          unlockLevel: 5,  overlay: 'assets/sprites/acc-glasses.png' },
+  { id: 'ballcap',    name: '해커톤 볼캡',              unlockLevel: 8,  overlay: 'assets/sprites/acc-ballcap.png' },
   { id: 'headphones', name: '코딩 헤드폰',              unlockLevel: 10, overlay: 'assets/sprites/acc-headphones.png' },
+  { id: 'strawhat',   name: '휴가 밀짚모자',            unlockLevel: 13, overlay: 'assets/sprites/acc-strawhat.png' },
   { id: 'crown',      name: '시니어 크라운',            unlockLevel: 15, overlay: 'assets/sprites/acc-crown.png' },
   { id: 'cap',        name: '졸업 캡',                  unlockLevel: 20, overlay: 'assets/sprites/acc-cap.png' },
   { id: 'halo-rare',  name: '???홀로그램 후광 (희귀)',  unlockLevel: 0,  overlay: null, rare: true, halo: true },
