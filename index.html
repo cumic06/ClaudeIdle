@@ -21,6 +21,7 @@
       <div class="tab active" data-tab="growth">🐾 pet.growth.ts</div>
       <div class="tab" data-tab="skins">📦 skins.config.json</div>
       <div class="tab" data-tab="stats">📈 stats.log</div>
+      <div class="tab" data-tab="terminal">🖥 terminal.log</div>
     </div>
 
     <div class="body">
@@ -31,6 +32,7 @@
           <div class="tree-item active" data-tab="growth">🐾 pet.growth.ts</div>
           <div class="tree-item" data-tab="skins">📦 skins.config.json</div>
           <div class="tree-item" data-tab="stats">📈 stats.log</div>
+          <div class="tree-item" data-tab="terminal">🖥 terminal.log</div>
         </div>
       </aside>
 
@@ -70,6 +72,13 @@
           <div class="acc-grid" id="acc-grid"></div>
         </section>
 
+        <section class="panel hidden" id="panel-terminal">
+          <div class="terminal in-panel">
+            <div class="terminal-header">TERMINAL — bash</div>
+            <div class="terminal-body" id="log"></div>
+          </div>
+        </section>
+
         <section class="panel hidden" id="panel-stats">
           <h2>STATS</h2>
           <div class="stats-detail" id="stats-detail">
@@ -85,11 +94,6 @@
           </div>
         </section>
       </main>
-    </div>
-
-    <div class="terminal">
-      <div class="terminal-header">TERMINAL — bash</div>
-      <div class="terminal-body" id="log"></div>
     </div>
 
     <div class="statusbar">

@@ -180,6 +180,16 @@ html, body {
 }
 .pet-accessory { display: none; }
 .pet-accessory.shown { display: block; }
+/* 액세서리 캔버스는 위로 24px 넓힌 128x104 → 모자가 머리 위로 올라올 여유 확보.
+   아래 60px(=80*0.75)를 pet과 정렬하고 위 18px(=24*0.75)만큼 끌어올린다. */
+.pet-sprite img.pet-accessory {
+  width: 96px;
+  height: 78px;
+  top: -18px;
+  left: 0;
+  right: auto;
+  bottom: auto;
+}
 
 .pet-body.hurt img { filter: brightness(2.2) saturate(3); }
 .pet-body.ko { opacity: .45; }
@@ -388,6 +398,12 @@ html, body {
   border-top: 1px solid #2d2d2d;
   display: flex;
   flex-direction: column;
+}
+/* 탭 패널 안에 들어간 터미널은 패널 전체 높이를 채운다 */
+.terminal.in-panel {
+  height: auto;
+  flex: 1;
+  border-top: none;
 }
 .terminal-header {
   padding: 4px 10px;

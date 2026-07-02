@@ -626,6 +626,7 @@ function init() {
 
   if (typeof state.curHp !== 'number' || state.curHp <= 0) state.curHp = state.stats.hp;
 
+  checkAccessoryUnlocks();   // 이미 도달한 레벨의 액세서리를 로드 시점에 소급 해금
   applyAccessoryVisual(currentAccessory());
   grantOfflineProgress();
   renderAccessoryGrid();
