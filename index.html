@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>claude-pet — growth.ide</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ide-window">
+    <div class="titlebar">
+      <div class="traffic-lights">
+        <span class="dot red" data-action="close"></span>
+        <span class="dot yellow" data-action="minimize"></span>
+        <span class="dot green" data-action="maximize"></span>
+      </div>
+      <div class="title">claude-pet — Visual Studio Code</div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="growth">🐾 pet.growth.ts</div>
+      <div class="tab" data-tab="skins">📦 skins.config.json</div>
+      <div class="tab" data-tab="stats">📈 stats.log</div>
+    </div>
+
+    <div class="body">
+      <aside class="sidebar">
+        <h3>EXPLORER</h3>
+        <div class="explorer-section">PET-GAME</div>
+        <div class="tree">
+          <div class="tree-item active" data-tab="growth">🐾 pet.growth.ts</div>
+          <div class="tree-item" data-tab="skins">📦 skins.config.json</div>
+          <div class="tree-item" data-tab="stats">📈 stats.log</div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section class="panel" id="panel-growth">
+          <div class="stage" id="stage">
+            <div class="pet-sprite" id="pet-sprite">
+              <div class="halo" id="halo"></div>
+              <div class="pet-body" id="pet-body">
+                <div class="pet-anim" id="pet-anim">
+                  <img id="pet-img" src="assets/sprites/pet-body.png" alt="claude-pet">
+                  <img class="pet-arm left" src="assets/sprites/pet-arm-left.png" alt="">
+                  <img class="pet-arm right" src="assets/sprites/pet-arm-right.png" alt="">
+                  <img id="pet-acc-img" class="pet-accessory" alt="">
+                </div>
+              </div>
+              <div class="laptop" id="laptop">💻</div>
+            </div>
+          </div>
+          <div class="hud">
+            <div class="hud-row">
+              <span class="label">Lv.<span id="level">1</span></span>
+              <div class="bar exp"><div class="fill" id="exp-fill"></div></div>
+              <span class="exp-text" id="exp-text">0 / 10</span>
+            </div>
+            <div class="hud-row">
+              <span class="label">HP</span>
+              <div class="bar hp"><div class="fill" id="hp-fill"></div></div>
+              <span class="exp-text" id="hp-text">20 / 20</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="panel-skins">
+          <h2>SKINS — 액세서리</h2>
+          <p class="panel-desc">레벨업하면 새 액세서리가 해금됩니다. 클릭해서 장착하세요.</p>
+          <div class="acc-grid" id="acc-grid"></div>
+        </section>
+
+        <section class="panel hidden" id="panel-stats">
+          <h2>STATS</h2>
+          <div class="stats-detail" id="stats-detail">
+            <div class="stat-line"><span>레벨</span><b id="sd-level"></b></div>
+            <div class="stat-line"><span>경험치</span><b id="sd-exp"></b></div>
+            <div class="stat-line"><span>❤ HP</span><b id="sd-hp"></b></div>
+            <div class="stat-line"><span>⚔ ATK</span><b id="sd-atk"></b></div>
+            <div class="stat-line"><span>🏃 SPD</span><b id="sd-spd"></b></div>
+            <div class="stat-line"><span>🍀 LUK</span><b id="sd-luk"></b></div>
+            <div class="stat-line"><span>🎯 잡은 몬스터</span><b id="sd-caught"></b></div>
+            <div class="stat-line"><span>👕 해금 액세서리</span><b id="sd-acc"></b></div>
+            <div class="stat-line"><span>⏱ 플레이 시간</span><b id="sd-playtime"></b></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-header">TERMINAL — bash</div>
+      <div class="terminal-body" id="log"></div>
+    </div>
+
+    <div class="statusbar">
+      <span id="save-indicator">💾 자동저장 대기중</span>
+      <span id="playtime">⏱ 0:00:00</span>
+    </div>
+  </div>
+
+<script src="game.js"></script>
+</body>
+</html>
