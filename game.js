@@ -72,6 +72,9 @@ const haloEl = document.getElementById('halo');
 const laptopEl = document.getElementById('laptop');
 const logEl = document.getElementById('log');
 const accGridEl = document.getElementById('acc-grid');
+const toastStackEl = document.getElementById('toast-stack');
+const unlockOverlayEl = document.getElementById('unlock-overlay');
+const levelupFlashEl = document.getElementById('levelup-flash');
 
 function loadState() {
   const raw = localStorage.getItem(SAVE_KEY);
@@ -134,6 +137,130 @@ function floatText(text, x, y, color) {
   setTimeout(() => el.remove(), 1150);
 }
 
+/* ---------- 게임 알림 (토스트 / 레벨업 배너 / 스킨 언락 팝업) ---------- */
+
+function showToast(text, opts = {}) {
+  if (!toastStackEl) return;
+  const el = document.createElement('div');
+  el.className = 'toast' + (opts.variant ? ` ${opts.variant}` : '');
+
+  const icon = document.createElement('div');
+  icon.className = 't-icon';
+  icon.textContent = opts.icon || '›';
+  el.appendChild(icon);
+
+  const body = document.createElement('div');
+  body.className = 't-body';
+  const t = document.createElement('div');
+  t.className = 't-text';
+  t.textContent = text;
+  body.appendChild(t);
+  if (opts.sub) {
+    const s = document.createElement('div');
+    s.className = 't-sub';
+    s.textContent = opts.sub;
+    body.appendChild(s);
+  }
+  el.appendChild(body);
+
+  toastStackEl.appendChild(el);
+  while (toastStackEl.childElementCount > 4) toastStackEl.removeChild(toastStackEl.firstChild);
+
+  setTimeout(() => {
+    el.classList.add('leaving');
+    setTimeout(() => el.remove(), 400);
+  }, opts.duration || 3000);
+}
+
+function showLevelUpBanner(level) {
+  if (levelupFlashEl) {
+    levelupFlashEl.classList.remove('show');
+    void levelupFlashEl.offsetWidth; // reflow → 애니메이션 재시작
+    levelupFlashEl.classList.add('show');
+  }
+  const banner = document.createElement('div');
+  banner.className = 'levelup-banner';
+  banner.innerHTML = `LEVEL UP!<small>Lv.${level} 달성</small>`;
+  document.querySelector('.ide-window').appendChild(banner);
+  setTimeout(() => banner.remove(), 1750);
+}
+
+let unlockQueue = [];
+let unlockActive = false;
+
+function queueUnlockPopup(acc) {
+  unlockQueue.push(acc);
+  if (!unlockActive) processUnlockQueue();
+}
+
+function processUnlockQueue() {
+  if (unlockQueue.length === 0) { unlockActive = false; return; }
+  unlockActive = true;
+  showUnlockCard(unlockQueue.shift());
+}
+
+function showUnlockCard(acc) {
+  if (!unlockOverlayEl) { processUnlockQueue(); return; }
+  unlockOverlayEl.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'unlock-card' + (acc.rare ? ' rare' : '');
+
+  const eyebrow = document.createElement('div');
+  eyebrow.className = 'unlock-eyebrow';
+  eyebrow.innerHTML = acc.rare
+    ? '<span class="star">★</span> RARE SKIN! <span class="star">★</span>'
+    : '<span class="star">★</span> NEW SKIN <span class="star">★</span>';
+  card.appendChild(eyebrow);
+
+  const preview = document.createElement('div');
+  preview.className = 'unlock-preview';
+  if (acc.halo) {
+    const glow = document.createElement('div');
+    glow.className = 'halo-mini';
+    preview.appendChild(glow);
+  }
+  const base = document.createElement('img');
+  base.src = PET_SPRITE;
+  preview.appendChild(base);
+  if (acc.overlay) {
+    const ov = document.createElement('img');
+    ov.src = acc.overlay;
+    preview.appendChild(ov);
+  }
+  card.appendChild(preview);
+
+  const name = document.createElement('div');
+  name.className = 'unlock-name';
+  name.textContent = acc.name;
+  card.appendChild(name);
+
+  const sub = document.createElement('div');
+  sub.className = 'unlock-sub';
+  sub.textContent = acc.rare ? '희귀 액세서리 획득!' : `Lv.${acc.unlockLevel} 달성 보상`;
+  card.appendChild(sub);
+
+  const hint = document.createElement('div');
+  hint.className = 'unlock-hint';
+  hint.textContent = '클릭하여 계속 · SKINS 탭에서 장착';
+  card.appendChild(hint);
+
+  unlockOverlayEl.appendChild(card);
+  unlockOverlayEl.classList.add('show');
+
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    clearTimeout(timer);
+    unlockOverlayEl.classList.remove('show');
+    unlockOverlayEl.removeEventListener('click', close);
+    setTimeout(processUnlockQueue, 340);
+  };
+  const timer = setTimeout(close, 4200);
+  unlockOverlayEl.addEventListener('click', close);
+}
+
 function gainExp(amount) {
   state.exp += amount;
   floatText(`+${amount} EXP`, petPos.x + 10, petPos.y - 10);
@@ -155,7 +282,7 @@ function levelUp() {
   if (state.level % 3 === 0) state.stats.luk += 1;
 
   addLog(`⭐ 레벨업! Lv.${state.level} 달성`);
-  floatText('LEVEL UP!', petPos.x - 4, petPos.y - 24, '#ffd54a');
+  showLevelUpBanner(state.level);
 
   checkAccessoryUnlocks();
 
@@ -163,19 +290,32 @@ function levelUp() {
   if (!state.accessories.includes('halo-rare') && Math.random() < rareDropChance) {
     state.accessories.push('halo-rare');
     addLog('✨ 희귀 액세서리 [???홀로그램 후광]을 발견했습니다!');
+    queueUnlockPopup(ACCESSORIES.find(a => a.id === 'halo-rare'));
   }
 
   renderAccessoryGrid();
 }
 
-function checkAccessoryUnlocks() {
+function checkAccessoryUnlocks(announce = true) {
+  const newly = [];
   ACCESSORIES.forEach(acc => {
     if (acc.rare) return;
 
     if (state.level >= acc.unlockLevel && !state.accessories.includes(acc.id)) {
       state.accessories.push(acc.id);
-      addLog(`📦 새 액세서리 해금: ${acc.name}`);
+      newly.push(acc);
     }
+  });
+
+  if (!announce) {
+    // 세이브 로드 시 소급 해금: 팝업 없이 조용히 처리
+    if (newly.length) addLog(`📦 해금된 액세서리 ${newly.length}종을 불러왔습니다`);
+    return;
+  }
+
+  newly.forEach(acc => {
+    addLog(`📦 새 액세서리 해금: ${acc.name}`);
+    queueUnlockPopup(acc);
   });
 }
 
@@ -582,6 +722,8 @@ function scheduleNextEvent() {
   setTimeout(() => {
     const event = IDLE_EVENTS[Math.floor(Math.random() * IDLE_EVENTS.length)];
     addLog(event.msg);
+    const sp = event.msg.indexOf(' ');
+    showToast(sp > 0 ? event.msg.slice(sp + 1) : event.msg, { icon: sp > 0 ? event.msg.slice(0, sp) : '›' });
     event.run();
     scheduleNextEvent();
   }, delay);
@@ -626,7 +768,7 @@ function init() {
 
   if (typeof state.curHp !== 'number' || state.curHp <= 0) state.curHp = state.stats.hp;
 
-  checkAccessoryUnlocks();   // 이미 도달한 레벨의 액세서리를 로드 시점에 소급 해금
+  checkAccessoryUnlocks(false);   // 이미 도달한 레벨의 액세서리를 로드 시점에 조용히 소급 해금
   applyAccessoryVisual(currentAccessory());
   grantOfflineProgress();
   renderAccessoryGrid();

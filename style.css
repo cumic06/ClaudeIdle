@@ -434,3 +434,183 @@ html, body {
   justify-content: space-between;
   padding: 0 10px;
 }
+
+/* ===================== 게임 알림 UI ===================== */
+
+/* --- 토스트 스택 (우상단) --- */
+.toast-stack {
+  position: fixed;
+  top: 44px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 90;
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 190px;
+  max-width: 280px;
+  background: linear-gradient(150deg, #2c2c2e, #202021);
+  border: 1px solid #3a3a3d;
+  border-left: 4px solid #d97757;
+  border-radius: 7px;
+  padding: 9px 13px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .45);
+  animation: toast-in .34s cubic-bezier(.2, 1.3, .4, 1) both;
+}
+.toast.leaving { animation: toast-out .38s ease forwards; }
+.toast.gold { border-left-color: #ffd54a; }
+.toast.rare { border-left-color: #a78bfa; }
+.toast .t-icon {
+  font-size: 18px;
+  line-height: 1;
+  filter: drop-shadow(0 0 5px rgba(255, 213, 74, .35));
+}
+.toast .t-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.toast .t-text { font-size: 12px; color: #ececec; font-weight: bold; }
+.toast .t-sub { font-size: 10px; color: #8f8f8f; }
+@keyframes toast-in {
+  0% { opacity: 0; transform: translateX(40px) scale(.9); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes toast-out {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(40px); height: 0; margin: 0; padding-top: 0; padding-bottom: 0; }
+}
+
+/* --- 레벨업 화면 플래시 + 배너 --- */
+.levelup-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  opacity: 0;
+  box-shadow: inset 0 0 120px 24px rgba(255, 213, 74, .55);
+}
+.levelup-flash.show { animation: flash-pulse .85s ease; }
+@keyframes flash-pulse {
+  0% { opacity: 0; } 28% { opacity: 1; } 100% { opacity: 0; }
+}
+.levelup-banner {
+  position: fixed;
+  top: 36%;
+  left: 50%;
+  z-index: 85;
+  pointer-events: none;
+  font-family: "Press Start 2P", monospace;
+  font-size: 20px;
+  color: #ffd54a;
+  text-shadow: 0 0 14px rgba(255, 213, 74, .8), 0 3px 0 #7a4a10;
+  animation: banner-up 1.7s ease forwards;
+  white-space: nowrap;
+}
+.levelup-banner small { display: block; text-align: center; font-size: 9px; color: #f0a878; margin-top: 8px; text-shadow: none; }
+@keyframes banner-up {
+  0% { opacity: 0; transform: translate(-50%, 14px) scale(.8); }
+  18% { opacity: 1; transform: translate(-50%, 0) scale(1.05); }
+  30% { transform: translate(-50%, 0) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -24px) scale(1); }
+}
+
+/* --- 스킨 언락 팝업 (중앙 모달) --- */
+.unlock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 6, 5, 0);
+  opacity: 0;
+  pointer-events: none;
+  transition: background .3s ease, opacity .3s ease;
+}
+.unlock-overlay.show {
+  background: rgba(8, 6, 5, .62);
+  opacity: 1;
+  pointer-events: auto;
+}
+.unlock-card {
+  position: relative;
+  background: linear-gradient(165deg, #2b2521, #17130f);
+  border: 3px solid #ffd54a;
+  border-radius: 14px;
+  padding: 22px 30px 24px;
+  text-align: center;
+  box-shadow: 0 0 0 2px #17130f, 0 0 34px rgba(255, 213, 74, .45), 0 16px 46px rgba(0, 0, 0, .6);
+  animation: unlock-pop .5s cubic-bezier(.2, 1.5, .35, 1) both;
+}
+.unlock-card::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 14px;
+  padding: 3px;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 213, 74, .9) 40deg, transparent 120deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spin 3.2s linear infinite;
+  pointer-events: none;
+}
+.unlock-eyebrow {
+  font-family: "Press Start 2P", monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #ffd54a;
+  text-shadow: 0 0 10px rgba(255, 213, 74, .7);
+}
+.unlock-eyebrow .star { color: #fff2b0; }
+.unlock-preview {
+  position: relative;
+  width: 128px;
+  height: 104px;
+  margin: 16px auto 12px;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .5));
+}
+.unlock-preview img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+.unlock-preview .halo-mini {
+  position: absolute;
+  inset: 6px 0 auto;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(140, 220, 255, .55), rgba(180, 120, 255, .35) 55%, transparent 72%);
+  filter: blur(2px);
+  animation: halo-pulse 1.6s ease-in-out infinite;
+}
+.unlock-name { font-size: 16px; color: #fff; font-weight: bold; }
+.unlock-sub { font-size: 11px; color: #b98; margin-top: 5px; }
+.unlock-hint { font-size: 10px; color: #7a7a7a; margin-top: 14px; }
+/* 희귀 등급 연출 */
+.unlock-card.rare { border-color: #a78bfa; box-shadow: 0 0 0 2px #17130f, 0 0 40px rgba(167, 139, 250, .55), 0 16px 46px rgba(0, 0, 0, .6); }
+.unlock-card.rare::before { background: conic-gradient(from 0deg, #ff6b6b, #ffd54a, #4ade80, #38bdf8, #a78bfa, #ff6b6b); animation: spin 2.4s linear infinite; }
+.unlock-card.rare .unlock-eyebrow { color: #c9b6ff; text-shadow: 0 0 12px rgba(167, 139, 250, .8); }
+@keyframes unlock-pop {
+  0% { opacity: 0; transform: scale(.55) translateY(10px); }
+  65% { transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- HUD 게이지 광택 (게임 느낌) --- */
+.bar { position: relative; box-shadow: inset 0 1px 2px rgba(0, 0, 0, .55); }
+.bar .fill { position: relative; }
+.bar .fill::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 45%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .38), rgba(255, 255, 255, 0));
+  border-radius: 5px 5px 0 0;
+}
