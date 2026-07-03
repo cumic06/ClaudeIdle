@@ -17,14 +17,42 @@ const storage = (() => {
 const PET_SPRITE = 'assets/sprites/pet.png';
 
 const ACCESSORIES = [
-  { id: 'none',       name: '맨머리 (기본)',            unlockLevel: 1,  overlay: null },
-  { id: 'glasses',    name: '개발자 선글라스',          unlockLevel: 5,  overlay: 'assets/sprites/acc-glasses.png' },
-  { id: 'ballcap',    name: '해커톤 볼캡',              unlockLevel: 8,  overlay: 'assets/sprites/acc-ballcap.png' },
-  { id: 'headphones', name: '코딩 헤드폰',              unlockLevel: 10, overlay: 'assets/sprites/acc-headphones.png' },
-  { id: 'strawhat',   name: '휴가 밀짚모자',            unlockLevel: 13, overlay: 'assets/sprites/acc-strawhat.png' },
-  { id: 'crown',      name: '시니어 크라운',            unlockLevel: 15, overlay: 'assets/sprites/acc-crown.png' },
-  { id: 'cap',        name: '졸업 캡',                  unlockLevel: 20, overlay: 'assets/sprites/acc-cap.png' },
-  { id: 'halo-rare',  name: '???홀로그램 후광 (희귀)',  unlockLevel: 0,  overlay: null, rare: true, halo: true },
+  { id: 'none',        name: '맨머리 (기본)',            unlockLevel: 1,  overlay: null },
+  { id: 'glasses',     name: '개발자 선글라스',          unlockLevel: 5,  overlay: 'assets/sprites/acc-glasses.png' },
+  { id: 'ballcap',     name: '해커톤 볼캡',              unlockLevel: 8,  overlay: 'assets/sprites/acc-ballcap.png' },
+  { id: 'headphones',  name: '코딩 헤드폰',              unlockLevel: 10, overlay: 'assets/sprites/acc-headphones.png' },
+  { id: 'strawhat',    name: '휴가 밀짚모자',            unlockLevel: 13, overlay: 'assets/sprites/acc-strawhat.png' },
+  { id: 'crown',       name: '시니어 크라운',            unlockLevel: 15, overlay: 'assets/sprites/acc-crown.png' },
+  { id: 'cap',         name: '졸업 캡',                  unlockLevel: 20, overlay: 'assets/sprites/acc-cap.png' },
+  { id: 'bandana',     name: '레드 반다나',              unlockLevel: 22, overlay: 'assets/sprites/acc-bandana.png' },
+  { id: 'eyepatch',    name: '버그헌터 안대',            unlockLevel: 25, overlay: 'assets/sprites/acc-eyepatch.png' },
+  { id: 'headband',    name: '포커스 헤어밴드',          unlockLevel: 28, overlay: 'assets/sprites/acc-headband.png' },
+  { id: 'beanie',      name: '심야코딩 비니',            unlockLevel: 31, overlay: 'assets/sprites/acc-beanie.png' },
+  { id: 'ribbon',      name: '커밋 리본',                unlockLevel: 34, overlay: 'assets/sprites/acc-ribbon.png' },
+  { id: 'flowercrown', name: '스프린트 꽃관',            unlockLevel: 37, overlay: 'assets/sprites/acc-flowercrown.png' },
+  { id: 'catears',     name: '디버그 고양이 귀',         unlockLevel: 40, overlay: 'assets/sprites/acc-catears.png' },
+  { id: 'bunnyears',   name: '스탠드업 토끼 귀',         unlockLevel: 42, overlay: 'assets/sprites/acc-bunnyears.png' },
+  { id: 'santahat',    name: '연말 배포 산타모자',       unlockLevel: 44, overlay: 'assets/sprites/acc-santahat.png' },
+  { id: 'partyhat',    name: '릴리즈 파티모자',          unlockLevel: 46, overlay: 'assets/sprites/acc-partyhat.png' },
+  { id: 'wizardhat',   name: '아키텍트 마법사모자',      unlockLevel: 48, overlay: 'assets/sprites/acc-wizardhat.png' },
+  { id: 'goggles',     name: '딥다이브 고글',            unlockLevel: 50, overlay: 'assets/sprites/acc-goggles.png' },
+  { id: 'halo-rare',   name: '???홀로그램 후광 (희귀)',  unlockLevel: 0,  overlay: null, rare: true, halo: true },
+];
+
+const PET_SKINS = [
+  { id: 'default', name: '기본 클로드',       price: 0,   icon: '🐾', body: 'assets/sprites/pet-body.png',        armLeft: 'assets/sprites/pet-arm-left.png',        armRight: 'assets/sprites/pet-arm-right.png' },
+  { id: 'zombie',  name: '좀비 클로드',       price: 150, icon: '🧟', body: 'assets/sprites/pet-body-zombie.png', armLeft: 'assets/sprites/pet-arm-left-zombie.png', armRight: 'assets/sprites/pet-arm-right-zombie.png' },
+  { id: 'dark',    name: '다크모드 클로드',   price: 200, icon: '🌙', body: 'assets/sprites/pet-body-dark.png',   armLeft: 'assets/sprites/pet-arm-left-dark.png',   armRight: 'assets/sprites/pet-arm-right-dark.png' },
+  { id: 'rich',    name: '부자 클로드',       price: 300, icon: '💰', body: 'assets/sprites/pet-body-rich.png',   armLeft: 'assets/sprites/pet-arm-left-rich.png',   armRight: 'assets/sprites/pet-arm-right-rich.png' },
+  { id: 'neon',    name: '네온 클로드',       price: 400, icon: '⚡', body: 'assets/sprites/pet-body-neon.png',   armLeft: 'assets/sprites/pet-arm-left-neon.png',   armRight: 'assets/sprites/pet-arm-right-neon.png' },
+  { id: 'matrix',  name: '매트릭스 클로드',   price: 550, icon: '🟢', body: 'assets/sprites/pet-body-matrix.png', armLeft: 'assets/sprites/pet-arm-left-matrix.png', armRight: 'assets/sprites/pet-arm-right-matrix.png' },
+];
+
+const STAT_UPGRADES = [
+  { id: 'hp',  label: '❤ HP',  icon: '❤', step: 5,   basePrice: 8,  priceGrowth: 1.16 },
+  { id: 'atk', label: '⚔ ATK', icon: '⚔', step: 1,   basePrice: 12, priceGrowth: 1.2 },
+  { id: 'spd', label: '🏃 SPD', icon: '🏃', step: 0.2, basePrice: 10, priceGrowth: 1.2 },
+  { id: 'luk', label: '🍀 LUK', icon: '🍀', step: 1,   basePrice: 15, priceGrowth: 1.22 },
 ];
 
 const EQUIP_SLOTS = [
@@ -66,6 +94,7 @@ const IDLE_EVENTS = [
   { msg: '💰 황금 몬스터 출현! 잡으면 EXP 대박', run: () => spawnEnemy({ golden: true, force: true }) },
   { msg: '☄ 유성우가 내린다 (+10 EXP)', run: () => meteorShower() },
   { msg: '👾 보스 몬스터 출현!!', run: () => spawnEnemy({ boss: true, force: true }) },
+  { msg: '🪙 커밋 보너스! 코인을 획득했습니다', run: () => gainCoins(5 + Math.floor(Math.random() * 6)) },
 ];
 
 const BUG_FRAME_WIDTH = 58;
@@ -115,6 +144,10 @@ const laptopEl = document.getElementById('laptop');
 const logEl = document.getElementById('log');
 const accGridEl = document.getElementById('acc-grid');
 const eqGridEl = document.getElementById('eq-grid');
+const petArmLeftEl = document.getElementById('pet-arm-left');
+const petArmRightEl = document.getElementById('pet-arm-right');
+const shopGridEl = document.getElementById('shop-grid');
+const statUpgradeGridEl = document.getElementById('stat-upgrade-grid');
 const petEquipImgs = {
   weapon: document.getElementById('pet-eq-weapon'),
   shield: document.getElementById('pet-eq-shield'),
@@ -137,6 +170,10 @@ function freshState() {
     equippedAccessory: 'none',
     equipment: [],
     equipped: { weapon: null, shield: null, armor: null },
+    coins: 0,
+    skins: ['default'],
+    equippedSkin: 'default',
+    statUpgrades: { hp: 0, atk: 0, spd: 0, luk: 0 },
     monstersCaught: 0,
     totalPlaySeconds: 0,
     lastSeen: Date.now(),
@@ -201,8 +238,11 @@ function importSave() {
     state.curHp = Math.min(state.curHp, maxHp());
     applyAccessoryVisual(currentAccessory());
     applyEquipmentVisuals();
+    applySkinVisual(currentSkin());
     renderAccessoryGrid();
     renderEquipmentGrid();
+    renderShopGrid();
+    renderStatUpgradeGrid();
     updateHUD();
     updatePlaytime();
     saveState();
@@ -579,7 +619,10 @@ function levelUp() {
   state.stats.spd += 0.4;
   if (state.level % 3 === 0) state.stats.luk += 1;
 
-  addLog(`⭐ 레벨업! Lv.${state.level} 달성`);
+  const coinReward = 3 + Math.floor(state.level / 2);
+  state.coins += coinReward;
+
+  addLog(`⭐ 레벨업! Lv.${state.level} 달성 (+${coinReward}🪙)`);
   showLevelUpPopup(state.level);
 
   checkAccessoryUnlocks();
@@ -690,6 +733,142 @@ function renderAccessoryGrid() {
     if (unlocked) card.addEventListener('click', () => equipAccessory(acc.id));
 
     accGridEl.appendChild(card);
+  });
+}
+
+/* ---------- 재화(커밋 코인) & 상점 (구매형 스킨 · 능력치 강화) ---------- */
+
+function gainCoins(amount, x, y) {
+  state.coins += amount;
+  floatText(`+${amount}🪙`, x ?? petPos.x + 10, y ?? petPos.y - 24, '#ffd54a');
+  updateHUD();
+}
+
+function currentSkin() {
+  return PET_SKINS.find(s => s.id === state.equippedSkin) || PET_SKINS[0];
+}
+
+function applySkinVisual(skin) {
+  petImgEl.src = skin.body;
+  petArmLeftEl.src = skin.armLeft;
+  petArmRightEl.src = skin.armRight;
+}
+
+function buySkin(id) {
+  const skin = PET_SKINS.find(s => s.id === id);
+  if (!skin || state.skins.includes(id)) return;
+
+  if (state.coins < skin.price) {
+    showToast('코인이 부족합니다', { icon: '🪙' });
+
+    return;
+  }
+
+  state.coins -= skin.price;
+  state.skins.push(id);
+  state.equippedSkin = id;
+  addLog(`🛒 스킨 구매: ${skin.name} (-${skin.price}🪙)`);
+  showToast(`${skin.name} 구매 완료!`, { icon: skin.icon, variant: 'gold' });
+  applySkinVisual(skin);
+  renderShopGrid();
+  updateHUD();
+  saveState();
+}
+
+function equipSkin(id) {
+  if (!state.skins.includes(id)) return;
+
+  state.equippedSkin = id;
+  addLog(`🛒 스킨 장착: ${PET_SKINS.find(s => s.id === id).name}`);
+  applySkinVisual(currentSkin());
+  renderShopGrid();
+  saveState();
+}
+
+function renderShopGrid() {
+  shopGridEl.innerHTML = '';
+
+  PET_SKINS.forEach(skin => {
+    const owned = state.skins.includes(skin.id);
+    const equipped = state.equippedSkin === skin.id;
+    const afford = state.coins >= skin.price;
+
+    const card = document.createElement('div');
+    card.className = 'acc-card' + (equipped ? ' equipped' : '') + (!owned && !afford ? ' locked' : '');
+
+    const preview = document.createElement('div');
+    preview.className = 'acc-preview';
+    const img = document.createElement('img');
+    img.src = skin.body;
+    preview.appendChild(img);
+    card.appendChild(preview);
+
+    const name = document.createElement('div');
+    name.className = 'acc-name';
+    name.textContent = `${skin.icon} ${skin.name}`;
+    card.appendChild(name);
+
+    const status = document.createElement('div');
+    status.className = 'acc-status';
+    status.textContent = equipped ? '장착중' : (owned ? '클릭해서 장착' : `${skin.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`);
+    card.appendChild(status);
+
+    if (owned) card.addEventListener('click', () => equipSkin(skin.id));
+    else if (afford) card.addEventListener('click', () => buySkin(skin.id));
+
+    shopGridEl.appendChild(card);
+  });
+}
+
+function buyStatUpgrade(id) {
+  const def = STAT_UPGRADES.find(s => s.id === id);
+  const count = state.statUpgrades[id] || 0;
+  const price = Math.round(def.basePrice * Math.pow(def.priceGrowth, count));
+
+  if (state.coins < price) {
+    showToast('코인이 부족합니다', { icon: '🪙' });
+
+    return;
+  }
+
+  state.coins -= price;
+  state.statUpgrades[id] = count + 1;
+  state.stats[id] = Math.round((state.stats[id] + def.step) * 10) / 10;
+  if (id === 'hp') state.curHp = maxHp();
+  else state.curHp = Math.min(state.curHp, maxHp());
+
+  addLog(`💪 능력치 강화: ${def.label} +${def.step} (-${price}🪙)`);
+  showToast(`${def.label} 강화 완료!`, { icon: def.icon, variant: 'gold' });
+  renderStatUpgradeGrid();
+  updateHUD();
+  saveState();
+}
+
+function renderStatUpgradeGrid() {
+  statUpgradeGridEl.innerHTML = '';
+
+  STAT_UPGRADES.forEach(def => {
+    const count = state.statUpgrades[def.id] || 0;
+    const price = Math.round(def.basePrice * Math.pow(def.priceGrowth, count));
+    const afford = state.coins >= price;
+    const curVal = def.id === 'spd' ? state.stats[def.id].toFixed(1) : state.stats[def.id];
+
+    const row = document.createElement('div');
+    row.className = 'stat-upgrade-row';
+
+    const label = document.createElement('div');
+    label.className = 'stat-upgrade-label';
+    label.textContent = `${def.label} ${curVal}`;
+    row.appendChild(label);
+
+    const btn = document.createElement('button');
+    btn.className = 'menu-btn stat-upgrade-btn' + (afford ? '' : ' disabled');
+    btn.textContent = `+${def.step} (${price}🪙)`;
+    btn.disabled = !afford;
+    if (afford) btn.addEventListener('click', () => buyStatUpgrade(def.id));
+    row.appendChild(btn);
+
+    statUpgradeGridEl.appendChild(row);
   });
 }
 
@@ -819,8 +998,11 @@ function killEnemy(target) {
   const exp = Math.floor((3 + target.maxHp / 4) * (target.expMul || 1)) + (comboCount >= 2 ? comboCount : 0);
   gainExp(exp);
 
-  if (target.isBoss) addLog(`👾 보스 ${target.type.name} 격파!! (+${exp} EXP)`);
-  else if (target.isGolden) addLog(`💰 황금 ${target.type.name} 처치! EXP 대박 (+${exp} EXP)`);
+  const coinGain = target.isBoss ? 12 : target.isGolden ? 6 : 1 + Math.floor(Math.random() * 2);
+  gainCoins(coinGain, cx, target.y - 42);
+
+  if (target.isBoss) addLog(`👾 보스 ${target.type.name} 격파!! (+${exp} EXP · +${coinGain}🪙)`);
+  else if (target.isGolden) addLog(`💰 황금 ${target.type.name} 처치! EXP 대박 (+${exp} EXP · +${coinGain}🪙)`);
   else addLog(`⚔ ${target.type.name} 처치! (총 ${state.monstersCaught}마리)`);
 
   updateHUD();
@@ -1105,6 +1287,9 @@ function updateHUD() {
   document.getElementById('sd-caught').textContent = state.monstersCaught;
   document.getElementById('sd-acc').textContent = `${state.accessories.length} / ${ACCESSORIES.length}`;
   document.getElementById('sd-eq').textContent = `${state.equipment.length} / ${EQUIPMENT.length}`;
+  document.getElementById('sd-coins').textContent = state.coins;
+  document.getElementById('coin-display').textContent = `🪙 ${state.coins}`;
+  document.getElementById('shop-coin-balance').textContent = state.coins;
 }
 
 function updatePlaytime() {
@@ -1166,6 +1351,9 @@ function openPopup(name) {
 
   // display:none 상태에서는 scrollHeight가 0이라, 열린 뒤에 맨 아래로 내린다
   if (name === 'terminal') logEl.scrollTop = logEl.scrollHeight;
+
+  // 상점은 코인 잔액에 따라 구매 가능 여부가 바뀌므로 열 때마다 새로 그린다
+  if (name === 'shop') { renderShopGrid(); renderStatUpgradeGrid(); }
 }
 
 function closePopup() {
@@ -1244,9 +1432,12 @@ function init() {
 
   applyAccessoryVisual(currentAccessory());
   applyEquipmentVisuals();
+  applySkinVisual(currentSkin());
   grantOfflineProgress();
   renderAccessoryGrid();
   renderEquipmentGrid();
+  renderShopGrid();
+  renderStatUpgradeGrid();
   updateHUD();
   updatePlaytime();
   scheduleNextEvent();

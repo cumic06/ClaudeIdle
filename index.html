@@ -21,6 +21,7 @@
       <div class="tab active">🐾 pet.growth.ts</div>
       <div class="tab-actions">
         <button class="menu-btn" data-popup="skins">📦 스킨</button>
+        <button class="menu-btn" data-popup="shop">🛒 상점</button>
         <button class="menu-btn" data-popup="equip">⚔ 장비</button>
         <button class="menu-btn" data-popup="stats">📈 스탯</button>
         <button class="menu-btn" data-popup="terminal">🖥 로그</button>
@@ -36,8 +37,8 @@
               <div class="pet-body" id="pet-body">
                 <div class="pet-anim" id="pet-anim">
                   <img id="pet-img" src="assets/sprites/pet-body.png" alt="claude-pet">
-                  <img class="pet-arm left" src="assets/sprites/pet-arm-left.png" alt="">
-                  <img class="pet-arm right" src="assets/sprites/pet-arm-right.png" alt="">
+                  <img id="pet-arm-left" class="pet-arm left" src="assets/sprites/pet-arm-left.png" alt="">
+                  <img id="pet-arm-right" class="pet-arm right" src="assets/sprites/pet-arm-right.png" alt="">
                   <img id="pet-acc-img" class="pet-accessory" alt="">
                   <img id="pet-eq-armor" class="pet-equip armor" alt="">
                   <img id="pet-eq-weapon" class="pet-equip weapon" alt="">
@@ -66,6 +67,7 @@
 
     <div class="statusbar">
       <span id="save-indicator">💾 자동저장 대기중</span>
+      <span id="coin-display">🪙 0</span>
       <span id="playtime">⏱ 0:00:00</span>
     </div>
 
@@ -78,6 +80,20 @@
         <div class="popup-body">
           <p class="panel-desc">레벨업하면 새 액세서리가 해금됩니다. 클릭해서 장착하세요.</p>
           <div class="acc-grid" id="acc-grid"></div>
+        </div>
+      </section>
+
+      <section class="popup-window hidden" id="popup-shop">
+        <div class="popup-header">
+          <span class="popup-title">🛒 shop.json — 상점 (<span id="shop-coin-balance"></span>🪙)</span>
+          <button class="popup-close" aria-label="닫기">✕</button>
+        </div>
+        <div class="popup-body">
+          <p class="panel-desc">몬스터를 처치하면 커밋 코인을 얻습니다. 코인으로 능력치를 강화하거나 특별한 스킨을 구매하세요.</p>
+          <div class="shop-section-title">💪 능력치 강화</div>
+          <div class="stat-upgrade-grid" id="stat-upgrade-grid"></div>
+          <div class="shop-section-title">👔 프리미엄 스킨</div>
+          <div class="acc-grid" id="shop-grid"></div>
         </div>
       </section>
 
@@ -109,6 +125,7 @@
             <div class="stat-line"><span>🎯 잡은 몬스터</span><b id="sd-caught"></b></div>
             <div class="stat-line"><span>👕 해금 액세서리</span><b id="sd-acc"></b></div>
             <div class="stat-line"><span>⚔ 해금 장비</span><b id="sd-eq"></b></div>
+            <div class="stat-line"><span>🪙 커밋 코인</span><b id="sd-coins"></b></div>
             <div class="stat-line"><span>⏱ 플레이 시간</span><b id="sd-playtime"></b></div>
           </div>
           <div class="save-tools">

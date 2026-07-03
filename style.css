@@ -430,6 +430,42 @@ html, body {
 .acc-status { font-size: 10px; color: #6b6b6b; margin-top: 2px; }
 .acc-card.equipped .acc-status { color: #d97757; }
 
+/* Shop popup (재화 · 능력치 강화 · 프리미엄 스킨) */
+.shop-section-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  color: #d97757;
+  padding: 12px 20px 0;
+}
+.stat-upgrade-grid {
+  padding: 10px 20px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.stat-upgrade-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #252526;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.stat-upgrade-label { color: #d4d4d4; }
+.stat-upgrade-btn { font-size: 11px; white-space: nowrap; }
+.stat-upgrade-btn.disabled,
+.stat-upgrade-btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.stat-upgrade-btn.disabled:hover,
+.stat-upgrade-btn:disabled:hover {
+  background: #333;
+  border-color: #454545;
+  color: #cccccc;
+}
+
 /* Equipment popup */
 .eq-slots { padding-bottom: 8px; }
 .eq-slot-title {
