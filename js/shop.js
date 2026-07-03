@@ -197,6 +197,88 @@ function renderShopEquipGrid() {
   });
 }
 
+/* ---------- 자동화 (레벨 도달 → 코인으로 1회 구매) ---------- */
+
+function hasAutomation(id) {
+  return state.automations.includes(id);
+}
+
+// 상자 레이더 보유 시 등장 간격을 줄인다 (main.js 루프에서 참조)
+function chestIntervalMul() {
+  return hasAutomation('chestRadar') ? CHEST_RADAR_INTERVAL_MUL : 1;
+}
+
+function buyAutomation(id) {
+  const auto = AUTOMATIONS.find(a => a.id === id);
+  if (!auto || hasAutomation(id)) return;
+
+  if (state.level < auto.unlockLevel) {
+    showToast(`Lv.${auto.unlockLevel} 도달 시 해금됩니다`, { icon: '🔒' });
+
+    return;
+  }
+
+  if (state.coins < auto.price) {
+    showToast('코인이 부족합니다', { icon: '🪙' });
+
+    return;
+  }
+
+  state.coins -= auto.price;
+  state.purchaseCount += 1;
+  state.totalCoinsSpent += auto.price;
+  state.automations.push(id);
+  addLog(`${auto.icon} 자동화 구매: ${auto.name} (-${auto.price}🪙)`);
+  showToast(`${auto.name} 작동 시작!`, { icon: auto.icon, variant: 'gold', sub: auto.desc });
+  renderAutomationGrid();
+  checkAchievements();
+  updateHUD();
+  saveState();
+}
+
+function renderAutomationGrid() {
+  if (!automationGridEl) return;
+  automationGridEl.innerHTML = '';
+
+  AUTOMATIONS.forEach(auto => {
+    const owned = hasAutomation(auto.id);
+    const unlocked = state.level >= auto.unlockLevel;
+    const afford = state.coins >= auto.price;
+
+    const card = document.createElement('div');
+    card.className =
+      'acc-card' + (owned ? ' equipped' : '') + (!owned && (!unlocked || !afford) ? ' locked' : '');
+
+    const preview = document.createElement('div');
+    preview.className = 'acc-preview achievement-preview';
+    preview.textContent = auto.icon;
+    card.appendChild(preview);
+
+    const name = document.createElement('div');
+    name.className = 'acc-name';
+    name.textContent = `${auto.name}`;
+    card.appendChild(name);
+
+    const bonusEl = document.createElement('div');
+    bonusEl.className = 'eq-bonus';
+    bonusEl.textContent = auto.desc;
+    card.appendChild(bonusEl);
+
+    const status = document.createElement('div');
+    status.className = 'acc-status';
+    status.textContent = owned
+      ? '작동 중 ✓'
+      : !unlocked
+        ? `Lv.${auto.unlockLevel} 필요`
+        : `${auto.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`;
+    card.appendChild(status);
+
+    if (!owned && unlocked && afford) card.addEventListener('click', () => buyAutomation(auto.id));
+
+    automationGridEl.appendChild(card);
+  });
+}
+
 function buyStatUpgrade(id) {
   const def = STAT_UPGRADES.find(s => s.id === id);
   const count = state.statUpgrades[id] || 0;

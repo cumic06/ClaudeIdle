@@ -103,6 +103,7 @@ function openPopup(name) {
     renderShopGrid();
     renderShopEquipGrid();
     renderStatUpgradeGrid();
+    renderAutomationGrid();
   }
 }
 
@@ -203,7 +204,8 @@ function loop(now) {
   chestSpawnCountdown -= dt;
   if (chestSpawnCountdown <= 0 && !activeChest) {
     chestSpawnCountdown =
-      CHEST_MIN_INTERVAL_S + Math.random() * (CHEST_MAX_INTERVAL_S - CHEST_MIN_INTERVAL_S);
+      (CHEST_MIN_INTERVAL_S + Math.random() * (CHEST_MAX_INTERVAL_S - CHEST_MIN_INTERVAL_S)) *
+      chestIntervalMul();
     spawnChest();
   }
 
@@ -238,6 +240,7 @@ function init() {
   renderShopGrid();
   renderShopEquipGrid();
   renderStatUpgradeGrid();
+  renderAutomationGrid();
   renderAchievementGrid();
   updateHUD();
   updatePlaytime();

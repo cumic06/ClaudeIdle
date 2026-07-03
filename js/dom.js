@@ -16,6 +16,7 @@ const petArmRightEl = document.getElementById('pet-arm-right');
 const shopGridEl = document.getElementById('shop-grid');
 const shopEquipGridEl = document.getElementById('shop-equip-grid');
 const statUpgradeGridEl = document.getElementById('stat-upgrade-grid');
+const automationGridEl = document.getElementById('automation-grid');
 const achievementGridEl = document.getElementById('achievement-grid');
 const equipVisibilityToggleEl = document.getElementById('btn-toggle-equip-visibility');
 const petEquipImgs = {

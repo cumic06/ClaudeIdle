@@ -1,7 +1,7 @@
 // 게임 밸런스·타이밍 상수
 
 const SAVE_KEY = 'claudePetGame.save.v3';
-const GAME_VERSION = '2026.07.03-1';
+const GAME_VERSION = '2026.07.03-2';
 const VERSION_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
 const PET_SPRITE = 'assets/sprites/pet.png';
@@ -32,3 +32,10 @@ const CHEST_MIN_INTERVAL_S = 40;
 const CHEST_MAX_INTERVAL_S = 75;
 const CHEST_DESPAWN_MS = 20000;
 const GACHA_ROLL_DURATION_MS = 1400;
+
+/* ---------- 자동화(상점 구매) ---------- */
+
+// 자동 상자 수집기: 상자 등장 후 이 시간이 지나면 자동으로 수집·개봉 (등장을 눈으로 볼 여유는 준다)
+const AUTO_CHEST_COLLECT_DELAY_MS = 2600;
+// 상자 레이더: 보유 시 상자 등장 간격 배수 (작을수록 자주 등장)
+const CHEST_RADAR_INTERVAL_MUL = 0.55;

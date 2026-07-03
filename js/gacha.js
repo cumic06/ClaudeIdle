@@ -21,17 +21,31 @@ function spawnChest() {
   const timer = setTimeout(() => {
     if (activeChest && activeChest.el === el) {
       el.remove();
+      if (activeChest.autoTimer) clearTimeout(activeChest.autoTimer);
       activeChest = null;
     }
   }, CHEST_DESPAWN_MS);
 
-  activeChest = { el, timer };
+  // 자동 상자 수집기 보유 시: 잠깐 뒤 자동으로 수집·개봉 (등장을 눈으로 볼 여유는 준다)
+  let autoTimer = null;
+  if (hasAutomation('autoChest')) {
+    el.classList.add('auto');
+    autoTimer = setTimeout(() => {
+      if (activeChest && activeChest.el === el) {
+        addLog('🤖 자동 수집기가 상자를 열었습니다');
+        openChest();
+      }
+    }, AUTO_CHEST_COLLECT_DELAY_MS);
+  }
+
+  activeChest = { el, timer, autoTimer };
 }
 
 function openChest() {
   if (!activeChest) return;
 
   clearTimeout(activeChest.timer);
+  if (activeChest.autoTimer) clearTimeout(activeChest.autoTimer);
   activeChest.el.remove();
   activeChest = null;
 

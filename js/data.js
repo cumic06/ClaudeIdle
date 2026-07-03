@@ -192,6 +192,43 @@ const PET_SKINS = [
     armLeft: 'assets/sprites/pet-arm-left-prism.png',
     armRight: 'assets/sprites/pet-arm-right-prism.png',
   },
+  // Lv100~200 장기 구간 코인 소비처 확장 (프리미엄 스킨)
+  {
+    id: 'sunset',
+    name: '노을 클로드',
+    price: 1400,
+    icon: '🌇',
+    body: 'assets/sprites/pet-body-sunset.png',
+    armLeft: 'assets/sprites/pet-arm-left-sunset.png',
+    armRight: 'assets/sprites/pet-arm-right-sunset.png',
+  },
+  {
+    id: 'aurora',
+    name: '오로라 클로드',
+    price: 1800,
+    icon: '🌈',
+    body: 'assets/sprites/pet-body-aurora.png',
+    armLeft: 'assets/sprites/pet-arm-left-aurora.png',
+    armRight: 'assets/sprites/pet-arm-right-aurora.png',
+  },
+  {
+    id: 'royal',
+    name: '로열 클로드',
+    price: 2400,
+    icon: '👑',
+    body: 'assets/sprites/pet-body-royal.png',
+    armLeft: 'assets/sprites/pet-arm-left-royal.png',
+    armRight: 'assets/sprites/pet-arm-right-royal.png',
+  },
+  {
+    id: 'diamond',
+    name: '다이아 클로드',
+    price: 3200,
+    icon: '💠',
+    body: 'assets/sprites/pet-body-diamond.png',
+    armLeft: 'assets/sprites/pet-arm-left-diamond.png',
+    armRight: 'assets/sprites/pet-arm-right-diamond.png',
+  },
   // 상자(가챠) 전용 — 상점 구매 불가, spawnChest()로만 획득
   {
     id: 'ghost',
@@ -476,6 +513,79 @@ const EQUIPMENT = [
     bonus: { hp: 370 },
     sprite: 'assets/sprites/eq-armor-omega.png',
   },
+  // Lv100~180 확장 (레벨 200까지 성장 목표를 이어감)
+  {
+    id: 'sword-aurora',
+    slot: 'weapon',
+    name: '오로라 블레이드',
+    unlockLevel: 100,
+    bonus: { atk: 70 },
+    sprite: 'assets/sprites/eq-sword-aurora.png',
+  },
+  {
+    id: 'sword-genesis',
+    slot: 'weapon',
+    name: '제네시스 엣지',
+    unlockLevel: 140,
+    bonus: { atk: 88 },
+    sprite: 'assets/sprites/eq-sword-genesis.png',
+  },
+  {
+    id: 'sword-singularity',
+    slot: 'weapon',
+    name: '싱귤래리티 소드',
+    unlockLevel: 180,
+    bonus: { atk: 112 },
+    sprite: 'assets/sprites/eq-sword-singularity.png',
+  },
+  {
+    id: 'shield-vanguard',
+    slot: 'shield',
+    name: '뱅가드 방패',
+    unlockLevel: 105,
+    bonus: { def: 23 },
+    sprite: 'assets/sprites/eq-shield-vanguard.png',
+  },
+  {
+    id: 'shield-bastion',
+    slot: 'shield',
+    name: '바스티온 방패',
+    unlockLevel: 145,
+    bonus: { def: 28 },
+    sprite: 'assets/sprites/eq-shield-bastion.png',
+  },
+  {
+    id: 'shield-omni',
+    slot: 'shield',
+    name: '옴니 방패',
+    unlockLevel: 185,
+    bonus: { def: 35 },
+    sprite: 'assets/sprites/eq-shield-omni.png',
+  },
+  {
+    id: 'armor-vantablack',
+    slot: 'armor',
+    name: '반타블랙 갑주',
+    unlockLevel: 100,
+    bonus: { hp: 460 },
+    sprite: 'assets/sprites/eq-armor-vantablack.png',
+  },
+  {
+    id: 'armor-empyrean',
+    slot: 'armor',
+    name: '엠피리언 갑주',
+    unlockLevel: 140,
+    bonus: { hp: 580 },
+    sprite: 'assets/sprites/eq-armor-empyrean.png',
+  },
+  {
+    id: 'armor-genesis',
+    slot: 'armor',
+    name: '제네시스 갑주',
+    unlockLevel: 180,
+    bonus: { hp: 720 },
+    sprite: 'assets/sprites/eq-armor-genesis.png',
+  },
   // 상점 구매 전용 (레벨 무관, 코인으로 구매)
   {
     id: 'sword-diamond',
@@ -603,6 +713,26 @@ const EQUIPMENT = [
 
 const GACHA_EQUIPMENT = EQUIPMENT.filter(e => e.source === 'gacha');
 
+/* ---------- 자동화 (특정 레벨 도달 → 상점에서 코인으로 1회 구매) ---------- */
+const AUTOMATIONS = [
+  {
+    id: 'autoChest',
+    name: '자동 상자 수집기',
+    icon: '🤖',
+    desc: '맵에 나타난 상자를 자동으로 수집·개봉합니다',
+    unlockLevel: 25,
+    price: 600,
+  },
+  {
+    id: 'chestRadar',
+    name: '상자 레이더',
+    icon: '📡',
+    desc: '상자가 더 자주 나타납니다 (등장 간격 -45%)',
+    unlockLevel: 45,
+    price: 1500,
+  },
+];
+
 const ENEMY_TYPES = [
   { id: 'bug', name: '버그', kind: 'bug', width: 58, height: 50 },
   { id: 'mon-1', name: '설인', kind: 'tile', sprite: 'assets/sprites/enemy-1.png' },
@@ -669,7 +799,8 @@ const IDLE_EVENTS = [
   },
 ];
 
-const ACHIEVEMENTS = [
+// 손으로 다듬은 초반 업적 (이름·설명이 특별한 것들)
+const CURATED_ACHIEVEMENTS = [
   {
     id: 'first-kill',
     name: '첫 처치',
@@ -762,3 +893,53 @@ const ACHIEVEMENTS = [
     check: s => s.level >= 100,
   },
 ];
+
+// 공식 기반 마일스톤 업적 — 거의 무한에 가깝게 자동 생성 (레벨 200 너머까지 목표 유지)
+function _numLabel(n) {
+  if (n >= 10000) return `${(n / 10000).toString().replace(/\.0$/, '')}만`;
+  if (n >= 1000) return `${(n / 1000).toString().replace(/\.0$/, '')}천`;
+
+  return `${n}`;
+}
+
+function _buildMilestoneAchievements() {
+  const out = [];
+  const push = (id, name, desc, icon, check) => out.push({ id, name, desc, icon, check });
+
+  // 레벨: 110~200 (10단위) + 220~500 (20단위) → 200을 넘어도 계속 목표가 남는다
+  const levels = [];
+  for (let l = 110; l <= 200; l += 10) levels.push(l);
+  for (let l = 220; l <= 500; l += 20) levels.push(l);
+  levels.forEach(l =>
+    push(`level-${l}`, `Lv.${l} 개발자`, `레벨 ${l} 달성`, '⭐', s => s.level >= l),
+  );
+
+  // 처치: 2천 → 100만 (지수 성장)
+  [2000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000].forEach(n =>
+    push(`kills-${n}`, `${_numLabel(n)} 처치`, `몬스터 ${n.toLocaleString()}마리 처치`, '⚔', s => s.monstersCaught >= n),
+  );
+
+  // 보스: 25 → 500
+  [25, 50, 100, 250, 500].forEach(n =>
+    push(`boss-${n}`, `보스 ${n}`, `보스 몬스터 ${n}마리 처치`, '👾', s => s.bossesKilled >= n),
+  );
+
+  // 상자: 25 → 2000
+  [25, 50, 100, 250, 500, 1000, 2000].forEach(n =>
+    push(`chests-${n}`, `상자 ${_numLabel(n)}개`, `상자 ${n.toLocaleString()}개 개봉`, '🎁', s => s.chestsOpened >= n),
+  );
+
+  // 누적 코인 사용: 1만 → 100만
+  [10000, 30000, 100000, 300000, 1000000].forEach(n =>
+    push(`spend-${n}`, `${_numLabel(n)} 코인 소비`, `누적 ${n.toLocaleString()}코인 사용`, '🪙', s => s.totalCoinsSpent >= n),
+  );
+
+  // 플레이 시간: 5h → 200h
+  [5, 12, 24, 48, 100, 200].forEach(h =>
+    push(`play-${h}h`, `${h}시간 플레이`, `누적 ${h}시간 플레이`, '⏱', s => s.totalPlaySeconds >= h * 3600),
+  );
+
+  return out;
+}
+
+const ACHIEVEMENTS = CURATED_ACHIEVEMENTS.concat(_buildMilestoneAchievements());

@@ -45,6 +45,7 @@ function freshState() {
     coins: 0,
     skins: ['default'],
     equippedSkin: 'default',
+    automations: [],
     statUpgrades: { hp: 0, atk: 0, spd: 0, luk: 0 },
     monstersCaught: 0,
     bossesKilled: 0,
@@ -122,6 +123,7 @@ function importSave() {
     renderShopGrid();
     renderShopEquipGrid();
     renderStatUpgradeGrid();
+    renderAutomationGrid();
     renderAchievementGrid();
     updateHUD();
     updatePlaytime();
@@ -180,6 +182,7 @@ function resetGame() {
 
   if (activeChest) {
     clearTimeout(activeChest.timer);
+    if (activeChest.autoTimer) clearTimeout(activeChest.autoTimer);
     activeChest.el.remove();
     activeChest = null;
   }
@@ -200,6 +203,7 @@ function resetGame() {
   renderShopGrid();
   renderShopEquipGrid();
   renderStatUpgradeGrid();
+  renderAutomationGrid();
   renderAchievementGrid();
   updateHUD();
   updatePlaytime();

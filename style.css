@@ -974,6 +974,11 @@ html, body {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
+/* 자동 수집기가 곧 열 상자 — 청록빛 후광으로 자동 수집 대상임을 표시 */
+.chest.auto {
+  filter: drop-shadow(0 0 7px rgba(87, 215, 242, .9));
+  animation: chest-bob 0.9s ease-in-out infinite;
+}
 
 /* --- 가챠 롤링 연출 (상자 개봉 → 보상 카드로 이어짐) --- */
 .gacha-roll-overlay {
