@@ -55,13 +55,35 @@ html, body {
   font-size: 12px;
   color: #8b8b8b;
   border-right: 1px solid #1a1a1a;
-  cursor: pointer;
 }
-.tab:hover { color: #cccccc; }
 .tab.active {
   background: #1e1e1e;
   color: #d97757;
   border-top: 2px solid #d97757;
+}
+
+/* 탭바 우측 메뉴 버튼 (팝업 열기) */
+.tab-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 8px;
+}
+.menu-btn {
+  font-family: inherit;
+  font-size: 11px;
+  background: #333;
+  color: #cccccc;
+  border: 1px solid #454545;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+.menu-btn:hover {
+  background: #3c3c3c;
+  border-color: #d97757;
+  color: #d97757;
 }
 
 /* Body layout */
@@ -108,15 +130,7 @@ html, body {
   min-width: 0;
 }
 .panel { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-.panel.hidden { display: none; }
-.panel h2 {
-  font-family: "Press Start 2P", monospace;
-  font-size: 13px;
-  color: #d97757;
-  padding: 16px 20px 6px;
-  margin: 0;
-}
-.panel-desc { padding: 0 20px; color: #9a9a9a; font-size: 12px; margin: 0 0 10px; }
+.panel-desc { padding: 14px 20px 0; color: #9a9a9a; font-size: 12px; margin: 0 0 10px; }
 
 /* Stage (growth panel) */
 .stage {
@@ -331,10 +345,8 @@ html, body {
 .bar.hp .fill { background: linear-gradient(90deg, #4ade80, #86efac); }
 .exp-text { color: #9a9a9a; min-width: 60px; text-align: right; }
 
-/* Skins panel */
+/* Skins popup */
 .acc-grid {
-  flex: 1;
-  overflow-y: auto;
   padding: 4px 20px 20px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -373,9 +385,9 @@ html, body {
 .acc-status { font-size: 10px; color: #6b6b6b; margin-top: 2px; }
 .acc-card.equipped .acc-status { color: #d97757; }
 
-/* Stats panel */
+/* Stats popup */
 .stats-detail {
-  padding: 6px 20px 20px;
+  padding: 16px 20px 20px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -391,26 +403,13 @@ html, body {
 }
 .stat-line b { color: #d97757; }
 
-/* Terminal */
-.terminal {
-  height: 140px;
-  background: #0c0c0c;
-  border-top: 1px solid #2d2d2d;
+/* Terminal popup */
+.terminal-popup {
+  height: 48vh;
+  padding: 0;
   display: flex;
   flex-direction: column;
-}
-/* 탭 패널 안에 들어간 터미널은 패널 전체 높이를 채운다 */
-.terminal.in-panel {
-  height: auto;
-  flex: 1;
-  border-top: none;
-}
-.terminal-header {
-  padding: 4px 10px;
-  font-size: 11px;
-  color: #8b8b8b;
-  background: #161616;
-  border-bottom: 1px solid #262626;
+  background: #0c0c0c;
 }
 .terminal-body {
   flex: 1;
@@ -433,6 +432,73 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
+}
+
+/* ===================== 메뉴 팝업 (버튼 → 중앙 모달) ===================== */
+
+/* 창 자체를 max-height로 뷰포트보다 작게 묶고 내부(.popup-body)만 스크롤 —
+   flex 중앙정렬 + overflow-auto 동시 사용 시 위쪽이 잘리는 함정 회피 */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 82;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 6, 5, 0);
+  opacity: 0;
+  pointer-events: none;
+  transition: background .25s ease, opacity .25s ease;
+}
+.popup-overlay.show {
+  background: rgba(8, 6, 5, .55);
+  opacity: 1;
+  pointer-events: auto;
+}
+.popup-window {
+  width: min(680px, 92vw);
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #1e1e1e;
+  border: 1px solid #454545;
+  border-radius: 10px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .6);
+  animation: popup-pop .26s cubic-bezier(.2, 1.3, .4, 1) both;
+}
+.popup-window.hidden { display: none; }
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #252526;
+  border-bottom: 1px solid #1a1a1a;
+  font-size: 12px;
+  color: #cccccc;
+  user-select: none;
+}
+.popup-close {
+  font-family: inherit;
+  font-size: 13px;
+  background: none;
+  border: none;
+  color: #8b8b8b;
+  padding: 2px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.popup-close:hover { background: #3c3c3c; color: #ffffff; }
+.popup-body {
+  overflow-y: auto;
+  min-height: 0;
+}
+#popup-stats { width: min(400px, 92vw); }
+#popup-terminal { width: min(620px, 92vw); }
+@keyframes popup-pop {
+  0% { opacity: 0; transform: scale(.92) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 /* ===================== 게임 알림 UI ===================== */

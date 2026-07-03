@@ -18,10 +18,12 @@
     </div>
 
     <div class="tabs">
-      <div class="tab active" data-tab="growth">🐾 pet.growth.ts</div>
-      <div class="tab" data-tab="skins">📦 skins.config.json</div>
-      <div class="tab" data-tab="stats">📈 stats.log</div>
-      <div class="tab" data-tab="terminal">🖥 terminal.log</div>
+      <div class="tab active">🐾 pet.growth.ts</div>
+      <div class="tab-actions">
+        <button class="menu-btn" data-popup="skins">📦 스킨</button>
+        <button class="menu-btn" data-popup="stats">📈 스탯</button>
+        <button class="menu-btn" data-popup="terminal">🖥 로그</button>
+      </div>
     </div>
 
     <div class="body">
@@ -29,10 +31,10 @@
         <h3>EXPLORER</h3>
         <div class="explorer-section">PET-GAME</div>
         <div class="tree">
-          <div class="tree-item active" data-tab="growth">🐾 pet.growth.ts</div>
-          <div class="tree-item" data-tab="skins">📦 skins.config.json</div>
-          <div class="tree-item" data-tab="stats">📈 stats.log</div>
-          <div class="tree-item" data-tab="terminal">🖥 terminal.log</div>
+          <div class="tree-item active">🐾 pet.growth.ts</div>
+          <div class="tree-item" data-popup="skins">📦 skins.config.json</div>
+          <div class="tree-item" data-popup="stats">📈 stats.log</div>
+          <div class="tree-item" data-popup="terminal">🖥 terminal.log</div>
         </div>
       </aside>
 
@@ -66,21 +68,32 @@
           </div>
         </section>
 
-        <section class="panel hidden" id="panel-skins">
-          <h2>SKINS — 액세서리</h2>
+      </main>
+    </div>
+
+    <div class="statusbar">
+      <span id="save-indicator">💾 자동저장 대기중</span>
+      <span id="playtime">⏱ 0:00:00</span>
+    </div>
+
+    <div class="popup-overlay" id="popup-overlay" aria-hidden="true">
+      <section class="popup-window hidden" id="popup-skins">
+        <div class="popup-header">
+          <span class="popup-title">📦 skins.config.json — 액세서리</span>
+          <button class="popup-close" aria-label="닫기">✕</button>
+        </div>
+        <div class="popup-body">
           <p class="panel-desc">레벨업하면 새 액세서리가 해금됩니다. 클릭해서 장착하세요.</p>
           <div class="acc-grid" id="acc-grid"></div>
-        </section>
+        </div>
+      </section>
 
-        <section class="panel hidden" id="panel-terminal">
-          <div class="terminal in-panel">
-            <div class="terminal-header">TERMINAL — bash</div>
-            <div class="terminal-body" id="log"></div>
-          </div>
-        </section>
-
-        <section class="panel hidden" id="panel-stats">
-          <h2>STATS</h2>
+      <section class="popup-window hidden" id="popup-stats">
+        <div class="popup-header">
+          <span class="popup-title">📈 stats.log — 스탯</span>
+          <button class="popup-close" aria-label="닫기">✕</button>
+        </div>
+        <div class="popup-body">
           <div class="stats-detail" id="stats-detail">
             <div class="stat-line"><span>레벨</span><b id="sd-level"></b></div>
             <div class="stat-line"><span>경험치</span><b id="sd-exp"></b></div>
@@ -92,13 +105,18 @@
             <div class="stat-line"><span>👕 해금 액세서리</span><b id="sd-acc"></b></div>
             <div class="stat-line"><span>⏱ 플레이 시간</span><b id="sd-playtime"></b></div>
           </div>
-        </section>
-      </main>
-    </div>
+        </div>
+      </section>
 
-    <div class="statusbar">
-      <span id="save-indicator">💾 자동저장 대기중</span>
-      <span id="playtime">⏱ 0:00:00</span>
+      <section class="popup-window hidden" id="popup-terminal">
+        <div class="popup-header">
+          <span class="popup-title">🖥 terminal.log — bash</span>
+          <button class="popup-close" aria-label="닫기">✕</button>
+        </div>
+        <div class="popup-body terminal-popup">
+          <div class="terminal-body" id="log"></div>
+        </div>
+      </section>
     </div>
 
     <div class="toast-stack" id="toast-stack"></div>

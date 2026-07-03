@@ -242,7 +242,7 @@ function showUnlockCard(acc) {
 
   const hint = document.createElement('div');
   hint.className = 'unlock-hint';
-  hint.textContent = '클릭하여 계속 · SKINS 탭에서 장착';
+  hint.textContent = '클릭하여 계속 · 📦 스킨 버튼에서 장착';
   card.appendChild(hint);
 
   unlockOverlayEl.appendChild(card);
@@ -707,14 +707,42 @@ document.querySelectorAll('.dot').forEach(dot => {
   });
 });
 
-function setActiveTab(tab) {
-  document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
-  document.querySelectorAll('.tree-item').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
-  document.querySelectorAll('.panel').forEach(el => el.classList.toggle('hidden', el.id !== `panel-${tab}`));
+/* ---------- 팝업 (버튼 → 중앙 모달) ---------- */
+
+const popupOverlayEl = document.getElementById('popup-overlay');
+let activePopup = null;
+
+function openPopup(name) {
+  const target = document.getElementById(`popup-${name}`);
+  if (!target) return;
+
+  popupOverlayEl.querySelectorAll('.popup-window').forEach(el => {
+    el.classList.toggle('hidden', el !== target);
+  });
+  popupOverlayEl.classList.add('show');
+  popupOverlayEl.setAttribute('aria-hidden', 'false');
+  activePopup = name;
+
+  // display:none 상태에서는 scrollHeight가 0이라, 열린 뒤에 맨 아래로 내린다
+  if (name === 'terminal') logEl.scrollTop = logEl.scrollHeight;
 }
 
-document.querySelectorAll('.tab, .tree-item').forEach(el => {
-  el.addEventListener('click', () => setActiveTab(el.dataset.tab));
+function closePopup() {
+  popupOverlayEl.classList.remove('show');
+  popupOverlayEl.setAttribute('aria-hidden', 'true');
+  activePopup = null;
+}
+
+document.querySelectorAll('[data-popup]').forEach(el => {
+  el.addEventListener('click', () => openPopup(el.dataset.popup));
+});
+
+popupOverlayEl.addEventListener('click', e => {
+  if (e.target === popupOverlayEl || e.target.closest('.popup-close')) closePopup();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && activePopup) closePopup();
 });
 
 function scheduleNextEvent() {
