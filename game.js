@@ -13,6 +13,27 @@ const ACCESSORIES = [
   { id: 'halo-rare',  name: '???홀로그램 후광 (희귀)',  unlockLevel: 0,  overlay: null, rare: true, halo: true },
 ];
 
+const EQUIP_SLOTS = [
+  { id: 'weapon', name: '무기', icon: '🗡' },
+  { id: 'shield', name: '방패', icon: '🛡' },
+  { id: 'armor',  name: '갑옷', icon: '🥋' },
+];
+
+const EQUIP_BONUS_LABELS = { atk: 'ATK', def: 'DEF', hp: 'HP' };
+
+const EQUIPMENT = [
+  { id: 'sword-wood',    slot: 'weapon', name: '나무 검',         unlockLevel: 3,  bonus: { atk: 2 },  sprite: 'assets/sprites/eq-sword-wood.png' },
+  { id: 'sword-steel',   slot: 'weapon', name: '강철 검',         unlockLevel: 8,  bonus: { atk: 5 },  sprite: 'assets/sprites/eq-sword-steel.png' },
+  { id: 'sword-laser',   slot: 'weapon', name: '레이저 블레이드', unlockLevel: 14, bonus: { atk: 9 },  sprite: 'assets/sprites/eq-sword-laser.png' },
+  { id: 'sword-legend',  slot: 'weapon', name: '전설의 디버거',   unlockLevel: 20, bonus: { atk: 15 }, sprite: 'assets/sprites/eq-sword-legend.png' },
+  { id: 'shield-wood',   slot: 'shield', name: '나무 방패',       unlockLevel: 5,  bonus: { def: 1 },  sprite: 'assets/sprites/eq-shield-wood.png' },
+  { id: 'shield-iron',   slot: 'shield', name: '강철 방패',       unlockLevel: 10, bonus: { def: 2 },  sprite: 'assets/sprites/eq-shield-iron.png' },
+  { id: 'shield-energy', slot: 'shield', name: '에너지 방패',     unlockLevel: 16, bonus: { def: 4 },  sprite: 'assets/sprites/eq-shield-energy.png' },
+  { id: 'armor-leather', slot: 'armor',  name: '가죽 갑옷',       unlockLevel: 6,  bonus: { hp: 15 },  sprite: 'assets/sprites/eq-armor-leather.png' },
+  { id: 'armor-iron',    slot: 'armor',  name: '강철 갑옷',       unlockLevel: 12, bonus: { hp: 35 },  sprite: 'assets/sprites/eq-armor-iron.png' },
+  { id: 'armor-mythril', slot: 'armor',  name: '미스릴 갑옷',     unlockLevel: 18, bonus: { hp: 70 },  sprite: 'assets/sprites/eq-armor-mythril.png' },
+];
+
 const ENEMY_TYPES = [
   { id: 'bug',    name: '버그',   kind: 'bug', width: 58, height: 50 },
   { id: 'mon-1',  name: '설인',   kind: 'tile', sprite: 'assets/sprites/enemy-1.png' },
@@ -72,6 +93,12 @@ const haloEl = document.getElementById('halo');
 const laptopEl = document.getElementById('laptop');
 const logEl = document.getElementById('log');
 const accGridEl = document.getElementById('acc-grid');
+const eqGridEl = document.getElementById('eq-grid');
+const petEquipImgs = {
+  weapon: document.getElementById('pet-eq-weapon'),
+  shield: document.getElementById('pet-eq-shield'),
+  armor: document.getElementById('pet-eq-armor'),
+};
 const toastStackEl = document.getElementById('toast-stack');
 const unlockOverlayEl = document.getElementById('unlock-overlay');
 const levelupFlashEl = document.getElementById('levelup-flash');
@@ -85,6 +112,8 @@ function loadState() {
     curHp: 20,
     accessories: ['none'],
     equippedAccessory: 'none',
+    equipment: [],
+    equipped: { weapon: null, shield: null, armor: null },
     monstersCaught: 0,
     totalPlaySeconds: 0,
     lastSeen: Date.now(),
@@ -114,6 +143,123 @@ function flashSaveIndicator() {
 
 function expToNext(level) {
   return Math.floor(10 * Math.pow(level, 1.4));
+}
+
+/* ---------- 장비 시스템 ---------- */
+
+function equipBonus(stat) {
+  return EQUIP_SLOTS.reduce((sum, slot) => {
+    const item = EQUIPMENT.find(e => e.id === state.equipped[slot.id]);
+
+    return sum + (item && item.bonus[stat] ? item.bonus[stat] : 0);
+  }, 0);
+}
+
+function maxHp() {
+  return state.stats.hp + equipBonus('hp');
+}
+
+function petAtk() {
+  return state.stats.atk + equipBonus('atk');
+}
+
+function checkEquipmentUnlocks(announce = true) {
+  const newly = EQUIPMENT.filter(eq => state.level >= eq.unlockLevel && !state.equipment.includes(eq.id));
+  newly.forEach(eq => state.equipment.push(eq.id));
+
+  if (!announce) {
+    // 세이브 로드 시 소급 해금: 팝업 없이 조용히 처리
+    if (newly.length) addLog(`⚔ 해금된 장비 ${newly.length}종을 불러왔습니다`);
+
+    return;
+  }
+
+  newly.forEach(eq => {
+    addLog(`⚔ 새 장비 해금: ${eq.name}`);
+    queueUnlockPopup(eq);
+  });
+}
+
+function equipItem(id) {
+  const item = EQUIPMENT.find(e => e.id === id);
+  if (!item || !state.equipment.includes(id)) return;
+
+  const wasEquipped = state.equipped[item.slot] === id;
+  state.equipped[item.slot] = wasEquipped ? null : id;
+  state.curHp = Math.min(state.curHp, maxHp());
+  addLog(wasEquipped ? `⚔ 장비 해제: ${item.name}` : `⚔ 장비 장착: ${item.name}`);
+  applyEquipmentVisuals();
+  renderEquipmentGrid();
+  updateHUD();
+  saveState();
+}
+
+function applyEquipmentVisuals() {
+  EQUIP_SLOTS.forEach(slot => {
+    const img = petEquipImgs[slot.id];
+    const item = EQUIPMENT.find(e => e.id === state.equipped[slot.id]);
+
+    if (item) {
+      img.src = item.sprite;
+      img.classList.add('shown');
+    } else {
+      img.classList.remove('shown');
+    }
+  });
+}
+
+function renderEquipmentGrid() {
+  eqGridEl.innerHTML = '';
+
+  EQUIP_SLOTS.forEach(slot => {
+    const title = document.createElement('div');
+    title.className = 'eq-slot-title';
+    title.textContent = `${slot.icon} ${slot.name}`;
+    eqGridEl.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'acc-grid eq-grid';
+
+    EQUIPMENT.filter(e => e.slot === slot.id).forEach(eq => {
+      const unlocked = state.equipment.includes(eq.id);
+      const equipped = state.equipped[slot.id] === eq.id;
+
+      const card = document.createElement('div');
+      card.className = 'acc-card' + (equipped ? ' equipped' : '') + (!unlocked ? ' locked' : '');
+
+      const preview = document.createElement('div');
+      preview.className = 'acc-preview eq-preview';
+      const img = document.createElement('img');
+      img.src = eq.sprite;
+      img.style.filter = unlocked ? '' : 'grayscale(1) brightness(.35)';
+      preview.appendChild(img);
+      card.appendChild(preview);
+
+      const name = document.createElement('div');
+      name.className = 'acc-name';
+      name.textContent = eq.name;
+      card.appendChild(name);
+
+      const bonusText = Object.entries(eq.bonus)
+        .map(([k, v]) => `+${v} ${EQUIP_BONUS_LABELS[k]}`)
+        .join(' · ');
+      const bonusEl = document.createElement('div');
+      bonusEl.className = 'eq-bonus';
+      bonusEl.textContent = bonusText;
+      card.appendChild(bonusEl);
+
+      const status = document.createElement('div');
+      status.className = 'acc-status';
+      status.textContent = equipped ? '장착중 (클릭해서 해제)' : (unlocked ? '클릭해서 장착' : `Lv.${eq.unlockLevel} 필요`);
+      card.appendChild(status);
+
+      if (unlocked) card.addEventListener('click', () => equipItem(eq.id));
+
+      grid.appendChild(card);
+    });
+
+    eqGridEl.appendChild(grid);
+  });
 }
 
 function addLog(msg) {
@@ -203,6 +349,8 @@ function showUnlockCard(acc) {
   if (!unlockOverlayEl) { processUnlockQueue(); return; }
   unlockOverlayEl.innerHTML = '';
 
+  const isEquip = !!acc.slot;
+
   const card = document.createElement('div');
   card.className = 'unlock-card' + (acc.rare ? ' rare' : '');
 
@@ -210,23 +358,29 @@ function showUnlockCard(acc) {
   eyebrow.className = 'unlock-eyebrow';
   eyebrow.innerHTML = acc.rare
     ? '<span class="star">★</span> RARE SKIN! <span class="star">★</span>'
-    : '<span class="star">★</span> NEW SKIN <span class="star">★</span>';
+    : `<span class="star">★</span> ${isEquip ? 'NEW GEAR' : 'NEW SKIN'} <span class="star">★</span>`;
   card.appendChild(eyebrow);
 
   const preview = document.createElement('div');
-  preview.className = 'unlock-preview';
+  preview.className = 'unlock-preview' + (isEquip ? ' equip' : '');
   if (acc.halo) {
     const glow = document.createElement('div');
     glow.className = 'halo-mini';
     preview.appendChild(glow);
   }
-  const base = document.createElement('img');
-  base.src = PET_SPRITE;
-  preview.appendChild(base);
-  if (acc.overlay) {
-    const ov = document.createElement('img');
-    ov.src = acc.overlay;
-    preview.appendChild(ov);
+  if (isEquip) {
+    const item = document.createElement('img');
+    item.src = acc.sprite;
+    preview.appendChild(item);
+  } else {
+    const base = document.createElement('img');
+    base.src = PET_SPRITE;
+    preview.appendChild(base);
+    if (acc.overlay) {
+      const ov = document.createElement('img');
+      ov.src = acc.overlay;
+      preview.appendChild(ov);
+    }
   }
   card.appendChild(preview);
 
@@ -237,12 +391,19 @@ function showUnlockCard(acc) {
 
   const sub = document.createElement('div');
   sub.className = 'unlock-sub';
-  sub.textContent = acc.rare ? '희귀 액세서리 획득!' : `Lv.${acc.unlockLevel} 달성 보상`;
+  if (isEquip) {
+    const bonusText = Object.entries(acc.bonus)
+      .map(([k, v]) => `+${v} ${EQUIP_BONUS_LABELS[k]}`)
+      .join(' · ');
+    sub.textContent = `Lv.${acc.unlockLevel} 달성 보상 (${bonusText})`;
+  } else {
+    sub.textContent = acc.rare ? '희귀 액세서리 획득!' : `Lv.${acc.unlockLevel} 달성 보상`;
+  }
   card.appendChild(sub);
 
   const hint = document.createElement('div');
   hint.className = 'unlock-hint';
-  hint.textContent = '클릭하여 계속 · 📦 스킨 버튼에서 장착';
+  hint.textContent = isEquip ? '클릭하여 계속 · ⚔ 장비 버튼에서 장착' : '클릭하여 계속 · 📦 스킨 버튼에서 장착';
   card.appendChild(hint);
 
   unlockOverlayEl.appendChild(card);
@@ -276,7 +437,7 @@ function gainExp(amount) {
 function levelUp() {
   state.level += 1;
   state.stats.hp += 5;
-  state.curHp = state.stats.hp;
+  state.curHp = maxHp();
   state.stats.atk += 1;
   state.stats.spd += 0.4;
   if (state.level % 3 === 0) state.stats.luk += 1;
@@ -285,6 +446,7 @@ function levelUp() {
   showLevelUpBanner(state.level);
 
   checkAccessoryUnlocks();
+  checkEquipmentUnlocks();
 
   const rareDropChance = 0.02 + state.stats.luk * 0.003;
   if (!state.accessories.includes('halo-rare') && Math.random() < rareDropChance) {
@@ -294,6 +456,7 @@ function levelUp() {
   }
 
   renderAccessoryGrid();
+  renderEquipmentGrid();
 }
 
 function checkAccessoryUnlocks(announce = true) {
@@ -475,8 +638,9 @@ function killEnemy(target) {
 function damagePet(amount, from) {
   if (isKnockedOut()) return;
 
-  state.curHp -= amount;
-  floatText(`-${amount}`, petPos.x + 30, petPos.y - 12, '#ff6b6b');
+  const reduced = Math.max(1, amount - equipBonus('def'));
+  state.curHp -= reduced;
+  floatText(`-${reduced}`, petPos.x + 30, petPos.y - 12, '#ff6b6b');
   petBodyEl.classList.add('hurt');
   setTimeout(() => petBodyEl.classList.remove('hurt'), 150);
 
@@ -487,7 +651,7 @@ function damagePet(amount, from) {
     addLog(`💫 ${from.type.name}에게 당했다... ${KO_DURATION_MS / 1000}초 후 부활`);
 
     setTimeout(() => {
-      state.curHp = state.stats.hp;
+      state.curHp = maxHp();
       petBodyEl.classList.remove('ko');
       addLog('💪 부활! 다시 싸운다');
       updateHUD();
@@ -522,7 +686,7 @@ function updateCombat(dt) {
 
   if (target && dist <= PET_ATTACK_RANGE && petAttackTimer <= 0) {
     petAttackTimer = PET_ATTACK_COOLDOWN;
-    const dmg = state.stats.atk + Math.floor(Math.random() * 3);
+    const dmg = petAtk() + Math.floor(Math.random() * 3);
     damageEnemy(target, dmg);
     petAnimEl.classList.add('lunge');
     setTimeout(() => petAnimEl.classList.remove('lunge'), 140);
@@ -650,20 +814,26 @@ function updateMovement(dt) {
 }
 
 function updateHUD() {
+  const hpMax = maxHp();
+  const atkBonus = equipBonus('atk');
+  const hpBonus = equipBonus('hp');
+
   document.getElementById('level').textContent = state.level;
   document.getElementById('exp-text').textContent = `${Math.floor(state.exp)} / ${expToNext(state.level)}`;
   document.getElementById('exp-fill').style.width = `${(state.exp / expToNext(state.level)) * 100}%`;
-  document.getElementById('hp-text').textContent = `${Math.ceil(state.curHp)} / ${state.stats.hp}`;
-  document.getElementById('hp-fill').style.width = `${(state.curHp / state.stats.hp) * 100}%`;
+  document.getElementById('hp-text').textContent = `${Math.ceil(state.curHp)} / ${hpMax}`;
+  document.getElementById('hp-fill').style.width = `${(state.curHp / hpMax) * 100}%`;
 
   document.getElementById('sd-level').textContent = state.level;
   document.getElementById('sd-exp').textContent = `${Math.floor(state.exp)} / ${expToNext(state.level)}`;
-  document.getElementById('sd-hp').textContent = `${Math.ceil(state.curHp)} / ${state.stats.hp}`;
-  document.getElementById('sd-atk').textContent = state.stats.atk;
+  document.getElementById('sd-hp').textContent = `${Math.ceil(state.curHp)} / ${hpMax}` + (hpBonus ? ` (+${hpBonus})` : '');
+  document.getElementById('sd-atk').textContent = atkBonus ? `${state.stats.atk} (+${atkBonus})` : state.stats.atk;
+  document.getElementById('sd-def').textContent = equipBonus('def');
   document.getElementById('sd-spd').textContent = state.stats.spd.toFixed(1);
   document.getElementById('sd-luk').textContent = state.stats.luk;
   document.getElementById('sd-caught').textContent = state.monstersCaught;
   document.getElementById('sd-acc').textContent = `${state.accessories.length} / ${ACCESSORIES.length}`;
+  document.getElementById('sd-eq').textContent = `${state.equipment.length} / ${EQUIPMENT.length}`;
 }
 
 function updatePlaytime() {
@@ -761,8 +931,8 @@ function tickSecond() {
   gainExp(0.5);
   state.totalPlaySeconds += 1;
 
-  if (!isKnockedOut() && state.curHp < state.stats.hp) {
-    state.curHp = Math.min(state.stats.hp, state.curHp + 1 + state.stats.hp * 0.01);
+  if (!isKnockedOut() && state.curHp < maxHp()) {
+    state.curHp = Math.min(maxHp(), state.curHp + 1 + maxHp() * 0.01);
   }
 
   updatePlaytime();
@@ -794,12 +964,16 @@ function init() {
   addLog('$ node growth.ts --mode=idle');
   addLog('claude-pet 이(가) 자라기 시작했습니다.');
 
-  if (typeof state.curHp !== 'number' || state.curHp <= 0) state.curHp = state.stats.hp;
-
   checkAccessoryUnlocks(false);   // 이미 도달한 레벨의 액세서리를 로드 시점에 조용히 소급 해금
+  checkEquipmentUnlocks(false);
+
+  if (typeof state.curHp !== 'number' || state.curHp <= 0) state.curHp = maxHp();
+
   applyAccessoryVisual(currentAccessory());
+  applyEquipmentVisuals();
   grantOfflineProgress();
   renderAccessoryGrid();
+  renderEquipmentGrid();
   updateHUD();
   updatePlaytime();
   scheduleNextEvent();

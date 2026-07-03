@@ -205,6 +205,23 @@ html, body {
   bottom: auto;
 }
 
+/* 장착 장비 오버레이 — 원본 픽셀 크기의 2배로 표시 (pet-bob은 그대로 상속) */
+.pet-equip { display: none; }
+.pet-equip.shown { display: block; }
+.pet-sprite img.pet-equip.weapon {
+  width: 24px; height: 44px;
+  left: auto; right: -14px; top: 4px; bottom: auto;
+  transform: rotate(14deg);
+}
+.pet-sprite img.pet-equip.shield {
+  width: 28px; height: auto;
+  left: -10px; right: auto; top: 20px; bottom: auto;
+}
+.pet-sprite img.pet-equip.armor {
+  width: 32px; height: 24px;
+  left: 32px; right: auto; top: 30px; bottom: auto;
+}
+
 .pet-body.hurt img { filter: brightness(2.2) saturate(3); }
 .pet-body.ko { opacity: .45; }
 .pet-body.ko img { filter: grayscale(1); animation: none; }
@@ -384,6 +401,18 @@ html, body {
 .acc-name { font-size: 12px; color: #cccccc; }
 .acc-status { font-size: 10px; color: #6b6b6b; margin-top: 2px; }
 .acc-card.equipped .acc-status { color: #d97757; }
+
+/* Equipment popup */
+.eq-slots { padding-bottom: 8px; }
+.eq-slot-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  color: #d97757;
+  padding: 12px 20px 0;
+}
+.eq-grid { padding: 10px 20px 8px; }
+.eq-preview img { object-fit: contain; }
+.eq-bonus { font-size: 11px; color: #6ee7a0; margin-top: 2px; }
 
 /* Stats popup */
 .stats-detail {
@@ -646,6 +675,7 @@ html, body {
   height: 100%;
   image-rendering: pixelated;
 }
+.unlock-preview.equip img { object-fit: contain; }
 .unlock-preview .halo-mini {
   position: absolute;
   inset: 6px 0 auto;
