@@ -68,12 +68,22 @@ const EQUIPMENT = [
   { id: 'sword-steel',   slot: 'weapon', name: '강철 검',         unlockLevel: 8,  bonus: { atk: 5 },  sprite: 'assets/sprites/eq-sword-steel.png' },
   { id: 'sword-laser',   slot: 'weapon', name: '레이저 블레이드', unlockLevel: 14, bonus: { atk: 9 },  sprite: 'assets/sprites/eq-sword-laser.png' },
   { id: 'sword-legend',  slot: 'weapon', name: '전설의 디버거',   unlockLevel: 20, bonus: { atk: 15 }, sprite: 'assets/sprites/eq-sword-legend.png' },
+  { id: 'sword-plasma',  slot: 'weapon', name: '플라즈마 소드',   unlockLevel: 26, bonus: { atk: 20 }, sprite: 'assets/sprites/eq-sword-plasma.png' },
+  { id: 'sword-void',    slot: 'weapon', name: '보이드 세이버',   unlockLevel: 38, bonus: { atk: 28 }, sprite: 'assets/sprites/eq-sword-void.png' },
   { id: 'shield-wood',   slot: 'shield', name: '나무 방패',       unlockLevel: 5,  bonus: { def: 1 },  sprite: 'assets/sprites/eq-shield-wood.png' },
   { id: 'shield-iron',   slot: 'shield', name: '강철 방패',       unlockLevel: 10, bonus: { def: 2 },  sprite: 'assets/sprites/eq-shield-iron.png' },
   { id: 'shield-energy', slot: 'shield', name: '에너지 방패',     unlockLevel: 16, bonus: { def: 4 },  sprite: 'assets/sprites/eq-shield-energy.png' },
-  { id: 'armor-leather', slot: 'armor',  name: '가죽 갑옷',       unlockLevel: 6,  bonus: { hp: 15 },  sprite: 'assets/sprites/eq-armor-leather.png' },
-  { id: 'armor-iron',    slot: 'armor',  name: '강철 갑옷',       unlockLevel: 12, bonus: { hp: 35 },  sprite: 'assets/sprites/eq-armor-iron.png' },
-  { id: 'armor-mythril', slot: 'armor',  name: '미스릴 갑옷',     unlockLevel: 18, bonus: { hp: 70 },  sprite: 'assets/sprites/eq-armor-mythril.png' },
+  { id: 'shield-mythic', slot: 'shield', name: '신화의 방패',     unlockLevel: 24, bonus: { def: 6 },  sprite: 'assets/sprites/eq-shield-mythic.png' },
+  { id: 'shield-aegis',  slot: 'shield', name: '이지스 방패',     unlockLevel: 36, bonus: { def: 9 },  sprite: 'assets/sprites/eq-shield-aegis.png' },
+  { id: 'armor-leather',   slot: 'armor', name: '가죽 갑옷',         unlockLevel: 6,  bonus: { hp: 15 },  sprite: 'assets/sprites/eq-armor-leather.png' },
+  { id: 'armor-iron',      slot: 'armor', name: '강철 갑옷',         unlockLevel: 12, bonus: { hp: 35 },  sprite: 'assets/sprites/eq-armor-iron.png' },
+  { id: 'armor-mythril',   slot: 'armor', name: '미스릴 갑옷',       unlockLevel: 18, bonus: { hp: 70 },  sprite: 'assets/sprites/eq-armor-mythril.png' },
+  { id: 'armor-dragon',    slot: 'armor', name: '드래곤 스케일 갑주', unlockLevel: 22, bonus: { hp: 110 }, sprite: 'assets/sprites/eq-armor-dragon.png' },
+  { id: 'armor-celestial', slot: 'armor', name: '천상의 갑주',        unlockLevel: 34, bonus: { hp: 165 }, sprite: 'assets/sprites/eq-armor-celestial.png' },
+  // 상점 구매 전용 (레벨 무관, 코인으로 구매)
+  { id: 'sword-diamond',  slot: 'weapon', name: '다이아몬드 소드', price: 450, bonus: { atk: 24 },  sprite: 'assets/sprites/eq-sword-diamond.png' },
+  { id: 'shield-crystal', slot: 'shield', name: '크리스탈 방패',   price: 380, bonus: { def: 7 },   sprite: 'assets/sprites/eq-shield-crystal.png' },
+  { id: 'armor-phoenix',  slot: 'armor',  name: '불사조 갑옷',     price: 550, bonus: { hp: 140 },  sprite: 'assets/sprites/eq-armor-phoenix.png' },
 ];
 
 const ENEMY_TYPES = [
@@ -147,6 +157,7 @@ const eqGridEl = document.getElementById('eq-grid');
 const petArmLeftEl = document.getElementById('pet-arm-left');
 const petArmRightEl = document.getElementById('pet-arm-right');
 const shopGridEl = document.getElementById('shop-grid');
+const shopEquipGridEl = document.getElementById('shop-equip-grid');
 const statUpgradeGridEl = document.getElementById('stat-upgrade-grid');
 const petEquipImgs = {
   weapon: document.getElementById('pet-eq-weapon'),
@@ -242,6 +253,7 @@ function importSave() {
     renderAccessoryGrid();
     renderEquipmentGrid();
     renderShopGrid();
+    renderShopEquipGrid();
     renderStatUpgradeGrid();
     updateHUD();
     updatePlaytime();
@@ -375,7 +387,11 @@ function renderEquipmentGrid() {
 
       const status = document.createElement('div');
       status.className = 'acc-status';
-      status.textContent = equipped ? '장착중 (클릭해서 해제)' : (unlocked ? '클릭해서 장착' : `Lv.${eq.unlockLevel} 필요`);
+      status.textContent = equipped
+        ? '장착중 (클릭해서 해제)'
+        : unlocked
+          ? '클릭해서 장착'
+          : (eq.price !== undefined ? `🛒 상점에서 구매 (${eq.price}🪙)` : `Lv.${eq.unlockLevel} 필요`);
       card.appendChild(status);
 
       if (unlocked) card.addEventListener('click', () => equipItem(eq.id));
@@ -817,6 +833,71 @@ function renderShopGrid() {
     else if (afford) card.addEventListener('click', () => buySkin(skin.id));
 
     shopGridEl.appendChild(card);
+  });
+}
+
+function buyEquipment(id) {
+  const item = EQUIPMENT.find(e => e.id === id);
+  if (!item || item.price === undefined || state.equipment.includes(id)) return;
+
+  if (state.coins < item.price) {
+    showToast('코인이 부족합니다', { icon: '🪙' });
+
+    return;
+  }
+
+  state.coins -= item.price;
+  state.equipment.push(id);
+  addLog(`🛒 장비 구매: ${item.name} (-${item.price}🪙)`);
+  showToast(`${item.name} 구매 완료!`, { icon: '⚔', variant: 'gold', sub: '⚔ 장비 메뉴에서 장착하세요' });
+  renderShopEquipGrid();
+  renderEquipmentGrid();
+  updateHUD();
+  saveState();
+}
+
+function renderShopEquipGrid() {
+  shopEquipGridEl.innerHTML = '';
+
+  EQUIPMENT.filter(eq => eq.price !== undefined).forEach(eq => {
+    const owned = state.equipment.includes(eq.id);
+    const equipped = state.equipped[eq.slot] === eq.id;
+    const afford = state.coins >= eq.price;
+
+    const card = document.createElement('div');
+    card.className = 'acc-card' + (equipped ? ' equipped' : '') + (!owned && !afford ? ' locked' : '');
+
+    const preview = document.createElement('div');
+    preview.className = 'acc-preview eq-preview';
+    const img = document.createElement('img');
+    img.src = eq.sprite;
+    preview.appendChild(img);
+    card.appendChild(preview);
+
+    const name = document.createElement('div');
+    name.className = 'acc-name';
+    name.textContent = eq.name;
+    card.appendChild(name);
+
+    const bonusText = Object.entries(eq.bonus)
+      .map(([k, v]) => `+${v} ${EQUIP_BONUS_LABELS[k]}`)
+      .join(' · ');
+    const bonusEl = document.createElement('div');
+    bonusEl.className = 'eq-bonus';
+    bonusEl.textContent = bonusText;
+    card.appendChild(bonusEl);
+
+    const status = document.createElement('div');
+    status.className = 'acc-status';
+    status.textContent = owned
+      ? (equipped ? '장착중' : '보유 중 · 클릭해서 장착')
+      : `${eq.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`;
+    card.appendChild(status);
+
+    if (owned) card.addEventListener('click', () => { equipItem(eq.id); renderShopEquipGrid(); });
+    else if (afford) card.addEventListener('click', () => buyEquipment(eq.id));
+
+    shopEquipGridEl.appendChild(card);
   });
 }
 
@@ -1353,7 +1434,7 @@ function openPopup(name) {
   if (name === 'terminal') logEl.scrollTop = logEl.scrollHeight;
 
   // 상점은 코인 잔액에 따라 구매 가능 여부가 바뀌므로 열 때마다 새로 그린다
-  if (name === 'shop') { renderShopGrid(); renderStatUpgradeGrid(); }
+  if (name === 'shop') { renderShopGrid(); renderShopEquipGrid(); renderStatUpgradeGrid(); }
 }
 
 function closePopup() {
@@ -1437,6 +1518,7 @@ function init() {
   renderAccessoryGrid();
   renderEquipmentGrid();
   renderShopGrid();
+  renderShopEquipGrid();
   renderStatUpgradeGrid();
   updateHUD();
   updatePlaytime();
