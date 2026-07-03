@@ -453,6 +453,36 @@ html, body {
 }
 .stat-line b { color: #d97757; }
 
+/* 세이브 백업 (스탯 팝업 하단) */
+.save-tools {
+  padding: 4px 20px 18px;
+  max-width: 360px;
+}
+.save-tools-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  color: #d97757;
+  margin: 10px 0 8px;
+}
+.save-tools textarea {
+  width: 100%;
+  resize: none;
+  background: #161616;
+  color: #7fd88f;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 8px;
+  font-family: inherit;
+  font-size: 11px;
+  word-break: break-all;
+}
+.save-tools textarea:focus { outline: none; border-color: #d97757; }
+.save-tools-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 /* Terminal popup */
 .terminal-popup {
   height: 48vh;

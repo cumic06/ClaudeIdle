@@ -1,5 +1,19 @@
 const SAVE_KEY = 'claudePetGame.save.v3';
 
+// 시크릿 모드·쿠키 전면 차단 환경에서는 localStorage 접근 자체가 throw → 안전 래퍼
+// (loadState가 파일 상단의 `let state = loadState()`에서 즉시 실행되므로 그보다 먼저 선언)
+const storage = (() => {
+  try {
+    const t = '__claudePet_test__';
+    localStorage.setItem(t, '1');
+    localStorage.removeItem(t);
+
+    return localStorage;
+  } catch {
+    return null;
+  }
+})();
+
 const PET_SPRITE = 'assets/sprites/pet.png';
 
 const ACCESSORIES = [
@@ -109,9 +123,8 @@ const toastStackEl = document.getElementById('toast-stack');
 const unlockOverlayEl = document.getElementById('unlock-overlay');
 const levelupFlashEl = document.getElementById('levelup-flash');
 
-function loadState() {
-  const raw = localStorage.getItem(SAVE_KEY);
-  const fresh = {
+function freshState() {
+  return {
     level: 1,
     exp: 0,
     stats: { hp: 20, atk: 3, spd: 3, luk: 3 },
@@ -124,20 +137,76 @@ function loadState() {
     totalPlaySeconds: 0,
     lastSeen: Date.now(),
   };
+}
 
-  if (!raw) return fresh;
+function loadState() {
+  const raw = storage ? storage.getItem(SAVE_KEY) : null;
+
+  if (!raw) return freshState();
 
   try {
-    return Object.assign(fresh, JSON.parse(raw));
+    return Object.assign(freshState(), JSON.parse(raw));
   } catch {
-    return fresh;
+    return freshState();
   }
 }
 
 function saveState() {
   state.lastSeen = Date.now();
-  localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-  flashSaveIndicator();
+
+  if (!storage) return;
+
+  try {
+    storage.setItem(SAVE_KEY, JSON.stringify(state));
+    flashSaveIndicator();
+  } catch {
+    document.getElementById('save-indicator').textContent = '💾 저장 실패';
+  }
+}
+
+/* ---------- 세이브 코드 내보내기 / 불러오기 (수동 백업) ---------- */
+
+function exportSave() {
+  state.lastSeen = Date.now();
+  const code = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+  const ta = document.getElementById('save-code');
+  ta.value = code;
+  ta.select();
+  if (navigator.clipboard) navigator.clipboard.writeText(code).catch(() => {});
+  showToast('세이브 코드 복사됨', { icon: '📤', sub: '메모장 등 안전한 곳에 보관하세요' });
+  addLog('📤 세이브 코드를 내보냈습니다');
+}
+
+function importSave() {
+  const code = document.getElementById('save-code').value.trim();
+
+  if (!code) {
+    showToast('세이브 코드를 먼저 붙여넣어주세요', { icon: '⚠' });
+
+    return;
+  }
+
+  try {
+    const parsed = JSON.parse(decodeURIComponent(escape(atob(code))));
+    if (typeof parsed.level !== 'number' || parsed.level < 1 || !parsed.stats) throw new Error('invalid save');
+
+    state = Object.assign(freshState(), parsed);
+    checkAccessoryUnlocks(false);
+    checkEquipmentUnlocks(false);
+    if (typeof state.curHp !== 'number' || state.curHp <= 0) state.curHp = maxHp();
+    state.curHp = Math.min(state.curHp, maxHp());
+    applyAccessoryVisual(currentAccessory());
+    applyEquipmentVisuals();
+    renderAccessoryGrid();
+    renderEquipmentGrid();
+    updateHUD();
+    updatePlaytime();
+    saveState();
+    showToast(`세이브 불러오기 완료 (Lv.${state.level})`, { icon: '📥', variant: 'gold' });
+    addLog(`📥 세이브를 불러왔습니다 (Lv.${state.level})`);
+  } catch {
+    showToast('세이브 코드가 올바르지 않습니다', { icon: '⚠', variant: 'rare' });
+  }
 }
 
 function flashSaveIndicator() {
@@ -511,6 +580,7 @@ function levelUp() {
 
   renderAccessoryGrid();
   renderEquipmentGrid();
+  saveState(); // 레벨업은 즉시 저장 (15초 주기·종료 저장이 누락돼도 진행 보존)
 }
 
 function checkAccessoryUnlocks(announce = true) {
@@ -1139,7 +1209,24 @@ function init() {
 
   requestAnimationFrame(loop);
   setInterval(saveState, 15000);
+  // beforeunload는 모바일·탭 강제종료에서 안 불릴 수 있어 pagehide/visibilitychange로 보강
   window.addEventListener('beforeunload', saveState);
+  window.addEventListener('pagehide', saveState);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') saveState();
+  });
+
+  document.getElementById('btn-export-save').addEventListener('click', exportSave);
+  document.getElementById('btn-import-save').addEventListener('click', importSave);
+
+  if (!storage) {
+    document.getElementById('save-indicator').textContent = '⚠ 자동저장 불가 (브라우저 설정)';
+    addLog('⚠ 저장소를 사용할 수 없습니다. 시크릿 모드/쿠키 차단 여부를 확인하세요.');
+    showToast('저장소를 사용할 수 없습니다', {
+      icon: '⚠', variant: 'rare', duration: 6500,
+      sub: '시크릿 모드/쿠키 차단 확인 · 스탯 팝업에서 세이브 코드로 백업 가능',
+    });
+  }
 }
 
 init();
