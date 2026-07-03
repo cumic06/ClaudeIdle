@@ -19,47 +19,258 @@ const storage = (() => {
 const PET_SPRITE = 'assets/sprites/pet.png';
 
 const ACCESSORIES = [
-  { id: 'none',        name: '맨머리 (기본)',            unlockLevel: 1,  overlay: null },
-  { id: 'glasses',     name: '개발자 선글라스',          unlockLevel: 5,  overlay: 'assets/sprites/acc-glasses.png' },
-  { id: 'ballcap',     name: '해커톤 볼캡',              unlockLevel: 8,  overlay: 'assets/sprites/acc-ballcap.png' },
-  { id: 'headphones',  name: '코딩 헤드폰',              unlockLevel: 10, overlay: 'assets/sprites/acc-headphones.png' },
-  { id: 'strawhat',    name: '휴가 밀짚모자',            unlockLevel: 13, overlay: 'assets/sprites/acc-strawhat.png' },
-  { id: 'crown',       name: '시니어 크라운',            unlockLevel: 15, overlay: 'assets/sprites/acc-crown.png' },
-  { id: 'cap',         name: '졸업 캡',                  unlockLevel: 20, overlay: 'assets/sprites/acc-cap.png' },
-  { id: 'bandana',     name: '레드 반다나',              unlockLevel: 22, overlay: 'assets/sprites/acc-bandana.png' },
-  { id: 'eyepatch',    name: '버그헌터 안대',            unlockLevel: 25, overlay: 'assets/sprites/acc-eyepatch.png' },
-  { id: 'headband',    name: '포커스 헤어밴드',          unlockLevel: 28, overlay: 'assets/sprites/acc-headband.png' },
-  { id: 'beanie',      name: '심야코딩 비니',            unlockLevel: 31, overlay: 'assets/sprites/acc-beanie.png' },
-  { id: 'ribbon',      name: '커밋 리본',                unlockLevel: 34, overlay: 'assets/sprites/acc-ribbon.png' },
-  { id: 'flowercrown', name: '스프린트 꽃관',            unlockLevel: 37, overlay: 'assets/sprites/acc-flowercrown.png' },
-  { id: 'catears',     name: '디버그 고양이 귀',         unlockLevel: 40, overlay: 'assets/sprites/acc-catears.png' },
-  { id: 'bunnyears',   name: '스탠드업 토끼 귀',         unlockLevel: 42, overlay: 'assets/sprites/acc-bunnyears.png' },
-  { id: 'santahat',    name: '연말 배포 산타모자',       unlockLevel: 44, overlay: 'assets/sprites/acc-santahat.png' },
-  { id: 'partyhat',    name: '릴리즈 파티모자',          unlockLevel: 46, overlay: 'assets/sprites/acc-partyhat.png' },
-  { id: 'wizardhat',   name: '아키텍트 마법사모자',      unlockLevel: 48, overlay: 'assets/sprites/acc-wizardhat.png' },
-  { id: 'goggles',     name: '딥다이브 고글',            unlockLevel: 50, overlay: 'assets/sprites/acc-goggles.png' },
-  { id: 'halo-rare',   name: '???홀로그램 후광 (희귀)',  unlockLevel: 0,  overlay: null, rare: true, halo: true },
+  { id: 'none', name: '맨머리 (기본)', unlockLevel: 1, overlay: null },
+  {
+    id: 'glasses',
+    name: '개발자 선글라스',
+    unlockLevel: 5,
+    overlay: 'assets/sprites/acc-glasses.png',
+  },
+  { id: 'ballcap', name: '해커톤 볼캡', unlockLevel: 8, overlay: 'assets/sprites/acc-ballcap.png' },
+  {
+    id: 'headphones',
+    name: '코딩 헤드폰',
+    unlockLevel: 10,
+    overlay: 'assets/sprites/acc-headphones.png',
+  },
+  {
+    id: 'strawhat',
+    name: '휴가 밀짚모자',
+    unlockLevel: 13,
+    overlay: 'assets/sprites/acc-strawhat.png',
+  },
+  { id: 'crown', name: '시니어 크라운', unlockLevel: 15, overlay: 'assets/sprites/acc-crown.png' },
+  { id: 'cap', name: '졸업 캡', unlockLevel: 20, overlay: 'assets/sprites/acc-cap.png' },
+  {
+    id: 'bandana',
+    name: '레드 반다나',
+    unlockLevel: 22,
+    overlay: 'assets/sprites/acc-bandana.png',
+  },
+  {
+    id: 'eyepatch',
+    name: '버그헌터 안대',
+    unlockLevel: 25,
+    overlay: 'assets/sprites/acc-eyepatch.png',
+  },
+  {
+    id: 'headband',
+    name: '포커스 헤어밴드',
+    unlockLevel: 28,
+    overlay: 'assets/sprites/acc-headband.png',
+  },
+  {
+    id: 'beanie',
+    name: '심야코딩 비니',
+    unlockLevel: 31,
+    overlay: 'assets/sprites/acc-beanie.png',
+  },
+  { id: 'ribbon', name: '커밋 리본', unlockLevel: 34, overlay: 'assets/sprites/acc-ribbon.png' },
+  {
+    id: 'flowercrown',
+    name: '스프린트 꽃관',
+    unlockLevel: 37,
+    overlay: 'assets/sprites/acc-flowercrown.png',
+  },
+  {
+    id: 'catears',
+    name: '디버그 고양이 귀',
+    unlockLevel: 40,
+    overlay: 'assets/sprites/acc-catears.png',
+  },
+  {
+    id: 'bunnyears',
+    name: '스탠드업 토끼 귀',
+    unlockLevel: 42,
+    overlay: 'assets/sprites/acc-bunnyears.png',
+  },
+  {
+    id: 'santahat',
+    name: '연말 배포 산타모자',
+    unlockLevel: 44,
+    overlay: 'assets/sprites/acc-santahat.png',
+  },
+  {
+    id: 'partyhat',
+    name: '릴리즈 파티모자',
+    unlockLevel: 46,
+    overlay: 'assets/sprites/acc-partyhat.png',
+  },
+  {
+    id: 'wizardhat',
+    name: '아키텍트 마법사모자',
+    unlockLevel: 48,
+    overlay: 'assets/sprites/acc-wizardhat.png',
+  },
+  {
+    id: 'goggles',
+    name: '딥다이브 고글',
+    unlockLevel: 50,
+    overlay: 'assets/sprites/acc-goggles.png',
+  },
+  {
+    id: 'halo-rare',
+    name: '???홀로그램 후광 (희귀)',
+    unlockLevel: 0,
+    overlay: null,
+    rare: true,
+    halo: true,
+  },
 ];
 
 const PET_SKINS = [
-  { id: 'default', name: '기본 클로드',       price: 0,   icon: '🐾', body: 'assets/sprites/pet-body.png',        armLeft: 'assets/sprites/pet-arm-left.png',        armRight: 'assets/sprites/pet-arm-right.png' },
-  { id: 'zombie',  name: '좀비 클로드',       price: 150, icon: '🧟', body: 'assets/sprites/pet-body-zombie.png', armLeft: 'assets/sprites/pet-arm-left-zombie.png', armRight: 'assets/sprites/pet-arm-right-zombie.png' },
-  { id: 'dark',    name: '다크모드 클로드',   price: 200, icon: '🌙', body: 'assets/sprites/pet-body-dark.png',   armLeft: 'assets/sprites/pet-arm-left-dark.png',   armRight: 'assets/sprites/pet-arm-right-dark.png' },
-  { id: 'rich',    name: '부자 클로드',       price: 300, icon: '💰', body: 'assets/sprites/pet-body-rich.png',   armLeft: 'assets/sprites/pet-arm-left-rich.png',   armRight: 'assets/sprites/pet-arm-right-rich.png' },
-  { id: 'neon',    name: '네온 클로드',       price: 400, icon: '⚡', body: 'assets/sprites/pet-body-neon.png',   armLeft: 'assets/sprites/pet-arm-left-neon.png',   armRight: 'assets/sprites/pet-arm-right-neon.png' },
-  { id: 'matrix',  name: '매트릭스 클로드',   price: 550, icon: '🟢', body: 'assets/sprites/pet-body-matrix.png', armLeft: 'assets/sprites/pet-arm-left-matrix.png', armRight: 'assets/sprites/pet-arm-right-matrix.png' },
+  {
+    id: 'default',
+    name: '기본 클로드',
+    price: 0,
+    icon: '🐾',
+    body: 'assets/sprites/pet-body.png',
+    armLeft: 'assets/sprites/pet-arm-left.png',
+    armRight: 'assets/sprites/pet-arm-right.png',
+  },
+  {
+    id: 'zombie',
+    name: '좀비 클로드',
+    price: 150,
+    icon: '🧟',
+    body: 'assets/sprites/pet-body-zombie.png',
+    armLeft: 'assets/sprites/pet-arm-left-zombie.png',
+    armRight: 'assets/sprites/pet-arm-right-zombie.png',
+  },
+  {
+    id: 'dark',
+    name: '다크모드 클로드',
+    price: 200,
+    icon: '🌙',
+    body: 'assets/sprites/pet-body-dark.png',
+    armLeft: 'assets/sprites/pet-arm-left-dark.png',
+    armRight: 'assets/sprites/pet-arm-right-dark.png',
+  },
+  {
+    id: 'rich',
+    name: '부자 클로드',
+    price: 300,
+    icon: '💰',
+    body: 'assets/sprites/pet-body-rich.png',
+    armLeft: 'assets/sprites/pet-arm-left-rich.png',
+    armRight: 'assets/sprites/pet-arm-right-rich.png',
+  },
+  {
+    id: 'neon',
+    name: '네온 클로드',
+    price: 400,
+    icon: '⚡',
+    body: 'assets/sprites/pet-body-neon.png',
+    armLeft: 'assets/sprites/pet-arm-left-neon.png',
+    armRight: 'assets/sprites/pet-arm-right-neon.png',
+  },
+  {
+    id: 'matrix',
+    name: '매트릭스 클로드',
+    price: 550,
+    icon: '🟢',
+    body: 'assets/sprites/pet-body-matrix.png',
+    armLeft: 'assets/sprites/pet-arm-left-matrix.png',
+    armRight: 'assets/sprites/pet-arm-right-matrix.png',
+  },
   // Lv50~100 구간 코인 소비처 확장
-  { id: 'crimson',  name: '진홍 클로드',   price: 700,  icon: '🔴', body: 'assets/sprites/pet-body-crimson.png',  armLeft: 'assets/sprites/pet-arm-left-crimson.png',  armRight: 'assets/sprites/pet-arm-right-crimson.png' },
-  { id: 'frost',    name: '서리 클로드',   price: 800,  icon: '❄',  body: 'assets/sprites/pet-body-frost.png',    armLeft: 'assets/sprites/pet-arm-left-frost.png',    armRight: 'assets/sprites/pet-arm-right-frost.png' },
-  { id: 'obsidian', name: '흑요석 클로드', price: 900,  icon: '⬛', body: 'assets/sprites/pet-body-obsidian.png', armLeft: 'assets/sprites/pet-arm-left-obsidian.png', armRight: 'assets/sprites/pet-arm-right-obsidian.png' },
-  { id: 'prism',    name: '프리즘 클로드', price: 1000, icon: '💎', body: 'assets/sprites/pet-body-prism.png',    armLeft: 'assets/sprites/pet-arm-left-prism.png',    armRight: 'assets/sprites/pet-arm-right-prism.png' },
+  {
+    id: 'crimson',
+    name: '진홍 클로드',
+    price: 700,
+    icon: '🔴',
+    body: 'assets/sprites/pet-body-crimson.png',
+    armLeft: 'assets/sprites/pet-arm-left-crimson.png',
+    armRight: 'assets/sprites/pet-arm-right-crimson.png',
+  },
+  {
+    id: 'frost',
+    name: '서리 클로드',
+    price: 800,
+    icon: '❄',
+    body: 'assets/sprites/pet-body-frost.png',
+    armLeft: 'assets/sprites/pet-arm-left-frost.png',
+    armRight: 'assets/sprites/pet-arm-right-frost.png',
+  },
+  {
+    id: 'obsidian',
+    name: '흑요석 클로드',
+    price: 900,
+    icon: '⬛',
+    body: 'assets/sprites/pet-body-obsidian.png',
+    armLeft: 'assets/sprites/pet-arm-left-obsidian.png',
+    armRight: 'assets/sprites/pet-arm-right-obsidian.png',
+  },
+  {
+    id: 'prism',
+    name: '프리즘 클로드',
+    price: 1000,
+    icon: '💎',
+    body: 'assets/sprites/pet-body-prism.png',
+    armLeft: 'assets/sprites/pet-arm-left-prism.png',
+    armRight: 'assets/sprites/pet-arm-right-prism.png',
+  },
   // 상자(가챠) 전용 — 상점 구매 불가, spawnChest()로만 획득
-  { id: 'ghost',  name: '유령 클로드', source: 'gacha', rarity: 'common', icon: '👻', body: 'assets/sprites/pet-body-ghost.png',  armLeft: 'assets/sprites/pet-arm-left-ghost.png',  armRight: 'assets/sprites/pet-arm-right-ghost.png' },
-  { id: 'lava',   name: '용암 클로드', source: 'gacha', rarity: 'common', icon: '🌋', body: 'assets/sprites/pet-body-lava.png',   armLeft: 'assets/sprites/pet-arm-left-lava.png',   armRight: 'assets/sprites/pet-arm-right-lava.png' },
-  { id: 'ice',    name: '빙하 클로드', source: 'gacha', rarity: 'rare',   icon: '🧊', body: 'assets/sprites/pet-body-ice.png',    armLeft: 'assets/sprites/pet-arm-left-ice.png',    armRight: 'assets/sprites/pet-arm-right-ice.png' },
-  { id: 'toxic',  name: '맹독 클로드', source: 'gacha', rarity: 'rare',   icon: '☣',  body: 'assets/sprites/pet-body-toxic.png',  armLeft: 'assets/sprites/pet-arm-left-toxic.png',  armRight: 'assets/sprites/pet-arm-right-toxic.png' },
-  { id: 'galaxy', name: '은하 클로드', source: 'gacha', rarity: 'epic',   icon: '🌌', body: 'assets/sprites/pet-body-galaxy.png', armLeft: 'assets/sprites/pet-arm-left-galaxy.png', armRight: 'assets/sprites/pet-arm-right-galaxy.png' },
-  { id: 'gold',   name: '황금 클로드', source: 'gacha', rarity: 'epic',   icon: '🏆', body: 'assets/sprites/pet-body-gold.png',   armLeft: 'assets/sprites/pet-arm-left-gold.png',   armRight: 'assets/sprites/pet-arm-right-gold.png' },
+  {
+    id: 'ghost',
+    name: '유령 클로드',
+    source: 'gacha',
+    rarity: 'common',
+    icon: '👻',
+    body: 'assets/sprites/pet-body-ghost.png',
+    armLeft: 'assets/sprites/pet-arm-left-ghost.png',
+    armRight: 'assets/sprites/pet-arm-right-ghost.png',
+  },
+  {
+    id: 'lava',
+    name: '용암 클로드',
+    source: 'gacha',
+    rarity: 'common',
+    icon: '🌋',
+    body: 'assets/sprites/pet-body-lava.png',
+    armLeft: 'assets/sprites/pet-arm-left-lava.png',
+    armRight: 'assets/sprites/pet-arm-right-lava.png',
+  },
+  {
+    id: 'ice',
+    name: '빙하 클로드',
+    source: 'gacha',
+    rarity: 'rare',
+    icon: '🧊',
+    body: 'assets/sprites/pet-body-ice.png',
+    armLeft: 'assets/sprites/pet-arm-left-ice.png',
+    armRight: 'assets/sprites/pet-arm-right-ice.png',
+  },
+  {
+    id: 'toxic',
+    name: '맹독 클로드',
+    source: 'gacha',
+    rarity: 'rare',
+    icon: '☣',
+    body: 'assets/sprites/pet-body-toxic.png',
+    armLeft: 'assets/sprites/pet-arm-left-toxic.png',
+    armRight: 'assets/sprites/pet-arm-right-toxic.png',
+  },
+  {
+    id: 'galaxy',
+    name: '은하 클로드',
+    source: 'gacha',
+    rarity: 'epic',
+    icon: '🌌',
+    body: 'assets/sprites/pet-body-galaxy.png',
+    armLeft: 'assets/sprites/pet-arm-left-galaxy.png',
+    armRight: 'assets/sprites/pet-arm-right-galaxy.png',
+  },
+  {
+    id: 'gold',
+    name: '황금 클로드',
+    source: 'gacha',
+    rarity: 'epic',
+    icon: '🏆',
+    body: 'assets/sprites/pet-body-gold.png',
+    armLeft: 'assets/sprites/pet-arm-left-gold.png',
+    armRight: 'assets/sprites/pet-arm-right-gold.png',
+  },
 ];
 
 const GACHA_SKINS = PET_SKINS.filter(s => s.source === 'gacha');
@@ -67,79 +278,361 @@ const GACHA_RARITY_WEIGHTS = { common: 55, rare: 30, epic: 15 };
 const GACHA_DUPLICATE_REFUND = { common: 15, rare: 35, epic: 80 };
 
 const STAT_UPGRADES = [
-  { id: 'hp',  label: '❤ HP',  icon: '❤', step: 5,   basePrice: 8,  priceGrowth: 1.16 },
-  { id: 'atk', label: '⚔ ATK', icon: '⚔', step: 1,   basePrice: 12, priceGrowth: 1.2 },
+  { id: 'hp', label: '❤ HP', icon: '❤', step: 5, basePrice: 8, priceGrowth: 1.16 },
+  { id: 'atk', label: '⚔ ATK', icon: '⚔', step: 1, basePrice: 12, priceGrowth: 1.2 },
   { id: 'spd', label: '🏃 SPD', icon: '🏃', step: 0.2, basePrice: 10, priceGrowth: 1.2 },
-  { id: 'luk', label: '🍀 LUK', icon: '🍀', step: 1,   basePrice: 15, priceGrowth: 1.22 },
+  { id: 'luk', label: '🍀 LUK', icon: '🍀', step: 1, basePrice: 15, priceGrowth: 1.22 },
 ];
 
 const EQUIP_SLOTS = [
   { id: 'weapon', name: '무기', icon: '🗡' },
   { id: 'shield', name: '방패', icon: '🛡' },
-  { id: 'armor',  name: '갑옷', icon: '🥋' },
+  { id: 'armor', name: '갑옷', icon: '🥋' },
 ];
 
 const EQUIP_BONUS_LABELS = { atk: 'ATK', def: 'DEF', hp: 'HP' };
 
 const EQUIPMENT = [
-  { id: 'sword-wood',    slot: 'weapon', name: '나무 검',         unlockLevel: 3,  bonus: { atk: 2 },  sprite: 'assets/sprites/eq-sword-wood.png' },
-  { id: 'sword-steel',   slot: 'weapon', name: '강철 검',         unlockLevel: 8,  bonus: { atk: 5 },  sprite: 'assets/sprites/eq-sword-steel.png' },
-  { id: 'sword-laser',   slot: 'weapon', name: '레이저 블레이드', unlockLevel: 14, bonus: { atk: 9 },  sprite: 'assets/sprites/eq-sword-laser.png' },
-  { id: 'sword-legend',  slot: 'weapon', name: '전설의 디버거',   unlockLevel: 20, bonus: { atk: 15 }, sprite: 'assets/sprites/eq-sword-legend.png' },
-  { id: 'sword-plasma',  slot: 'weapon', name: '플라즈마 소드',   unlockLevel: 26, bonus: { atk: 20 }, sprite: 'assets/sprites/eq-sword-plasma.png' },
-  { id: 'sword-void',    slot: 'weapon', name: '보이드 세이버',   unlockLevel: 38, bonus: { atk: 28 }, sprite: 'assets/sprites/eq-sword-void.png' },
-  { id: 'shield-wood',   slot: 'shield', name: '나무 방패',       unlockLevel: 5,  bonus: { def: 1 },  sprite: 'assets/sprites/eq-shield-wood.png' },
-  { id: 'shield-iron',   slot: 'shield', name: '강철 방패',       unlockLevel: 10, bonus: { def: 2 },  sprite: 'assets/sprites/eq-shield-iron.png' },
-  { id: 'shield-energy', slot: 'shield', name: '에너지 방패',     unlockLevel: 16, bonus: { def: 4 },  sprite: 'assets/sprites/eq-shield-energy.png' },
-  { id: 'shield-mythic', slot: 'shield', name: '신화의 방패',     unlockLevel: 24, bonus: { def: 6 },  sprite: 'assets/sprites/eq-shield-mythic.png' },
-  { id: 'shield-aegis',  slot: 'shield', name: '이지스 방패',     unlockLevel: 36, bonus: { def: 9 },  sprite: 'assets/sprites/eq-shield-aegis.png' },
-  { id: 'armor-leather',   slot: 'armor', name: '가죽 갑옷',         unlockLevel: 6,  bonus: { hp: 15 },  sprite: 'assets/sprites/eq-armor-leather.png' },
-  { id: 'armor-iron',      slot: 'armor', name: '강철 갑옷',         unlockLevel: 12, bonus: { hp: 35 },  sprite: 'assets/sprites/eq-armor-iron.png' },
-  { id: 'armor-mythril',   slot: 'armor', name: '미스릴 갑옷',       unlockLevel: 18, bonus: { hp: 70 },  sprite: 'assets/sprites/eq-armor-mythril.png' },
-  { id: 'armor-dragon',    slot: 'armor', name: '드래곤 스케일 갑주', unlockLevel: 22, bonus: { hp: 110 }, sprite: 'assets/sprites/eq-armor-dragon.png' },
-  { id: 'armor-celestial', slot: 'armor', name: '천상의 갑주',        unlockLevel: 34, bonus: { hp: 165 }, sprite: 'assets/sprites/eq-armor-celestial.png' },
+  {
+    id: 'sword-wood',
+    slot: 'weapon',
+    name: '나무 검',
+    unlockLevel: 3,
+    bonus: { atk: 2 },
+    sprite: 'assets/sprites/eq-sword-wood.png',
+  },
+  {
+    id: 'sword-steel',
+    slot: 'weapon',
+    name: '강철 검',
+    unlockLevel: 8,
+    bonus: { atk: 5 },
+    sprite: 'assets/sprites/eq-sword-steel.png',
+  },
+  {
+    id: 'sword-laser',
+    slot: 'weapon',
+    name: '레이저 블레이드',
+    unlockLevel: 14,
+    bonus: { atk: 9 },
+    sprite: 'assets/sprites/eq-sword-laser.png',
+  },
+  {
+    id: 'sword-legend',
+    slot: 'weapon',
+    name: '전설의 디버거',
+    unlockLevel: 20,
+    bonus: { atk: 15 },
+    sprite: 'assets/sprites/eq-sword-legend.png',
+  },
+  {
+    id: 'sword-plasma',
+    slot: 'weapon',
+    name: '플라즈마 소드',
+    unlockLevel: 26,
+    bonus: { atk: 20 },
+    sprite: 'assets/sprites/eq-sword-plasma.png',
+  },
+  {
+    id: 'sword-void',
+    slot: 'weapon',
+    name: '보이드 세이버',
+    unlockLevel: 38,
+    bonus: { atk: 28 },
+    sprite: 'assets/sprites/eq-sword-void.png',
+  },
+  {
+    id: 'shield-wood',
+    slot: 'shield',
+    name: '나무 방패',
+    unlockLevel: 5,
+    bonus: { def: 1 },
+    sprite: 'assets/sprites/eq-shield-wood.png',
+  },
+  {
+    id: 'shield-iron',
+    slot: 'shield',
+    name: '강철 방패',
+    unlockLevel: 10,
+    bonus: { def: 2 },
+    sprite: 'assets/sprites/eq-shield-iron.png',
+  },
+  {
+    id: 'shield-energy',
+    slot: 'shield',
+    name: '에너지 방패',
+    unlockLevel: 16,
+    bonus: { def: 4 },
+    sprite: 'assets/sprites/eq-shield-energy.png',
+  },
+  {
+    id: 'shield-mythic',
+    slot: 'shield',
+    name: '신화의 방패',
+    unlockLevel: 24,
+    bonus: { def: 6 },
+    sprite: 'assets/sprites/eq-shield-mythic.png',
+  },
+  {
+    id: 'shield-aegis',
+    slot: 'shield',
+    name: '이지스 방패',
+    unlockLevel: 36,
+    bonus: { def: 9 },
+    sprite: 'assets/sprites/eq-shield-aegis.png',
+  },
+  {
+    id: 'armor-leather',
+    slot: 'armor',
+    name: '가죽 갑옷',
+    unlockLevel: 6,
+    bonus: { hp: 15 },
+    sprite: 'assets/sprites/eq-armor-leather.png',
+  },
+  {
+    id: 'armor-iron',
+    slot: 'armor',
+    name: '강철 갑옷',
+    unlockLevel: 12,
+    bonus: { hp: 35 },
+    sprite: 'assets/sprites/eq-armor-iron.png',
+  },
+  {
+    id: 'armor-mythril',
+    slot: 'armor',
+    name: '미스릴 갑옷',
+    unlockLevel: 18,
+    bonus: { hp: 70 },
+    sprite: 'assets/sprites/eq-armor-mythril.png',
+  },
+  {
+    id: 'armor-dragon',
+    slot: 'armor',
+    name: '드래곤 스케일 갑주',
+    unlockLevel: 22,
+    bonus: { hp: 110 },
+    sprite: 'assets/sprites/eq-armor-dragon.png',
+  },
+  {
+    id: 'armor-celestial',
+    slot: 'armor',
+    name: '천상의 갑주',
+    unlockLevel: 34,
+    bonus: { hp: 165 },
+    sprite: 'assets/sprites/eq-armor-celestial.png',
+  },
   // Lv50~100 구간 확장 (레벨 100 밸런스 조정과 함께 추가)
-  { id: 'sword-quantum',   slot: 'weapon', name: '퀀텀 세이버',      unlockLevel: 50, bonus: { atk: 36 }, sprite: 'assets/sprites/eq-sword-quantum.png' },
-  { id: 'sword-eclipse',   slot: 'weapon', name: '이클립스 블레이드', unlockLevel: 65, bonus: { atk: 46 }, sprite: 'assets/sprites/eq-sword-eclipse.png' },
-  { id: 'sword-infinity',  slot: 'weapon', name: '인피니티 엣지',    unlockLevel: 80, bonus: { atk: 58 }, sprite: 'assets/sprites/eq-sword-infinity.png' },
-  { id: 'shield-titan',    slot: 'shield', name: '타이탄 방패',      unlockLevel: 55, bonus: { def: 12 }, sprite: 'assets/sprites/eq-shield-titan.png' },
-  { id: 'shield-phantom',  slot: 'shield', name: '팬텀 방패',        unlockLevel: 70, bonus: { def: 15 }, sprite: 'assets/sprites/eq-shield-phantom.png' },
-  { id: 'shield-eternal',  slot: 'shield', name: '이터널 방패',      unlockLevel: 85, bonus: { def: 19 }, sprite: 'assets/sprites/eq-shield-eternal.png' },
-  { id: 'armor-drakonis',  slot: 'armor',  name: '드라코니스 갑주',  unlockLevel: 50, bonus: { hp: 220 }, sprite: 'assets/sprites/eq-armor-drakonis.png' },
-  { id: 'armor-celestion', slot: 'armor',  name: '셀레스티온 갑주',  unlockLevel: 68, bonus: { hp: 290 }, sprite: 'assets/sprites/eq-armor-celestion.png' },
-  { id: 'armor-omega',     slot: 'armor',  name: '오메가 갑주',      unlockLevel: 88, bonus: { hp: 370 }, sprite: 'assets/sprites/eq-armor-omega.png' },
+  {
+    id: 'sword-quantum',
+    slot: 'weapon',
+    name: '퀀텀 세이버',
+    unlockLevel: 50,
+    bonus: { atk: 36 },
+    sprite: 'assets/sprites/eq-sword-quantum.png',
+  },
+  {
+    id: 'sword-eclipse',
+    slot: 'weapon',
+    name: '이클립스 블레이드',
+    unlockLevel: 65,
+    bonus: { atk: 46 },
+    sprite: 'assets/sprites/eq-sword-eclipse.png',
+  },
+  {
+    id: 'sword-infinity',
+    slot: 'weapon',
+    name: '인피니티 엣지',
+    unlockLevel: 80,
+    bonus: { atk: 58 },
+    sprite: 'assets/sprites/eq-sword-infinity.png',
+  },
+  {
+    id: 'shield-titan',
+    slot: 'shield',
+    name: '타이탄 방패',
+    unlockLevel: 55,
+    bonus: { def: 12 },
+    sprite: 'assets/sprites/eq-shield-titan.png',
+  },
+  {
+    id: 'shield-phantom',
+    slot: 'shield',
+    name: '팬텀 방패',
+    unlockLevel: 70,
+    bonus: { def: 15 },
+    sprite: 'assets/sprites/eq-shield-phantom.png',
+  },
+  {
+    id: 'shield-eternal',
+    slot: 'shield',
+    name: '이터널 방패',
+    unlockLevel: 85,
+    bonus: { def: 19 },
+    sprite: 'assets/sprites/eq-shield-eternal.png',
+  },
+  {
+    id: 'armor-drakonis',
+    slot: 'armor',
+    name: '드라코니스 갑주',
+    unlockLevel: 50,
+    bonus: { hp: 220 },
+    sprite: 'assets/sprites/eq-armor-drakonis.png',
+  },
+  {
+    id: 'armor-celestion',
+    slot: 'armor',
+    name: '셀레스티온 갑주',
+    unlockLevel: 68,
+    bonus: { hp: 290 },
+    sprite: 'assets/sprites/eq-armor-celestion.png',
+  },
+  {
+    id: 'armor-omega',
+    slot: 'armor',
+    name: '오메가 갑주',
+    unlockLevel: 88,
+    bonus: { hp: 370 },
+    sprite: 'assets/sprites/eq-armor-omega.png',
+  },
   // 상점 구매 전용 (레벨 무관, 코인으로 구매)
-  { id: 'sword-diamond',  slot: 'weapon', name: '다이아몬드 소드', price: 450, bonus: { atk: 24 },  sprite: 'assets/sprites/eq-sword-diamond.png' },
-  { id: 'shield-crystal', slot: 'shield', name: '크리스탈 방패',   price: 380, bonus: { def: 7 },   sprite: 'assets/sprites/eq-shield-crystal.png' },
-  { id: 'armor-phoenix',  slot: 'armor',  name: '불사조 갑옷',     price: 550, bonus: { hp: 140 },  sprite: 'assets/sprites/eq-armor-phoenix.png' },
-  { id: 'shield-runic',   slot: 'shield', name: '룬 방패',         price: 700, bonus: { def: 11 },  sprite: 'assets/sprites/eq-shield-runic.png' },
-  { id: 'armor-nebula',   slot: 'armor',  name: '네뷸라 갑주',     price: 900, bonus: { hp: 300 },  sprite: 'assets/sprites/eq-armor-nebula.png' },
+  {
+    id: 'sword-diamond',
+    slot: 'weapon',
+    name: '다이아몬드 소드',
+    price: 450,
+    bonus: { atk: 24 },
+    sprite: 'assets/sprites/eq-sword-diamond.png',
+  },
+  {
+    id: 'shield-crystal',
+    slot: 'shield',
+    name: '크리스탈 방패',
+    price: 380,
+    bonus: { def: 7 },
+    sprite: 'assets/sprites/eq-shield-crystal.png',
+  },
+  {
+    id: 'armor-phoenix',
+    slot: 'armor',
+    name: '불사조 갑옷',
+    price: 550,
+    bonus: { hp: 140 },
+    sprite: 'assets/sprites/eq-armor-phoenix.png',
+  },
+  {
+    id: 'shield-runic',
+    slot: 'shield',
+    name: '룬 방패',
+    price: 700,
+    bonus: { def: 11 },
+    sprite: 'assets/sprites/eq-shield-runic.png',
+  },
+  {
+    id: 'armor-nebula',
+    slot: 'armor',
+    name: '네뷸라 갑주',
+    price: 900,
+    bonus: { hp: 300 },
+    sprite: 'assets/sprites/eq-armor-nebula.png',
+  },
   // 상자(가챠) 전용 — 레벨/상점 무관, spawnChest()로 획득. 희귀도는 GACHA_RARITY_WEIGHTS 참조
-  { id: 'sword-storm',   slot: 'weapon', name: '폭풍의 검',    source: 'gacha', rarity: 'common', bonus: { atk: 16 }, sprite: 'assets/sprites/eq-sword-storm.png' },
-  { id: 'sword-inferno', slot: 'weapon', name: '인페르노 소드', source: 'gacha', rarity: 'rare',   bonus: { atk: 26 }, sprite: 'assets/sprites/eq-sword-inferno.png' },
-  { id: 'sword-nova',    slot: 'weapon', name: '노바 세이버',   source: 'gacha', rarity: 'epic',   bonus: { atk: 40 }, sprite: 'assets/sprites/eq-sword-nova.png' },
-  { id: 'shield-coral',   slot: 'shield', name: '산호 방패',   source: 'gacha', rarity: 'common', bonus: { def: 5 },  sprite: 'assets/sprites/eq-shield-coral.png' },
-  { id: 'shield-thunder', slot: 'shield', name: '뇌전 방패',   source: 'gacha', rarity: 'rare',   bonus: { def: 8 },  sprite: 'assets/sprites/eq-shield-thunder.png' },
-  { id: 'shield-cosmic',  slot: 'shield', name: '코스믹 방패', source: 'gacha', rarity: 'epic',   bonus: { def: 13 }, sprite: 'assets/sprites/eq-shield-cosmic.png' },
-  { id: 'armor-jade',  slot: 'armor', name: '옥 갑옷',     source: 'gacha', rarity: 'common', bonus: { hp: 90 },  sprite: 'assets/sprites/eq-armor-jade.png' },
-  { id: 'armor-abyss', slot: 'armor', name: '심연 갑주',   source: 'gacha', rarity: 'rare',   bonus: { hp: 150 }, sprite: 'assets/sprites/eq-armor-abyss.png' },
-  { id: 'armor-solar', slot: 'armor', name: '태양 갑주',   source: 'gacha', rarity: 'epic',   bonus: { hp: 230 }, sprite: 'assets/sprites/eq-armor-solar.png' },
+  {
+    id: 'sword-storm',
+    slot: 'weapon',
+    name: '폭풍의 검',
+    source: 'gacha',
+    rarity: 'common',
+    bonus: { atk: 16 },
+    sprite: 'assets/sprites/eq-sword-storm.png',
+  },
+  {
+    id: 'sword-inferno',
+    slot: 'weapon',
+    name: '인페르노 소드',
+    source: 'gacha',
+    rarity: 'rare',
+    bonus: { atk: 26 },
+    sprite: 'assets/sprites/eq-sword-inferno.png',
+  },
+  {
+    id: 'sword-nova',
+    slot: 'weapon',
+    name: '노바 세이버',
+    source: 'gacha',
+    rarity: 'epic',
+    bonus: { atk: 40 },
+    sprite: 'assets/sprites/eq-sword-nova.png',
+  },
+  {
+    id: 'shield-coral',
+    slot: 'shield',
+    name: '산호 방패',
+    source: 'gacha',
+    rarity: 'common',
+    bonus: { def: 5 },
+    sprite: 'assets/sprites/eq-shield-coral.png',
+  },
+  {
+    id: 'shield-thunder',
+    slot: 'shield',
+    name: '뇌전 방패',
+    source: 'gacha',
+    rarity: 'rare',
+    bonus: { def: 8 },
+    sprite: 'assets/sprites/eq-shield-thunder.png',
+  },
+  {
+    id: 'shield-cosmic',
+    slot: 'shield',
+    name: '코스믹 방패',
+    source: 'gacha',
+    rarity: 'epic',
+    bonus: { def: 13 },
+    sprite: 'assets/sprites/eq-shield-cosmic.png',
+  },
+  {
+    id: 'armor-jade',
+    slot: 'armor',
+    name: '옥 갑옷',
+    source: 'gacha',
+    rarity: 'common',
+    bonus: { hp: 90 },
+    sprite: 'assets/sprites/eq-armor-jade.png',
+  },
+  {
+    id: 'armor-abyss',
+    slot: 'armor',
+    name: '심연 갑주',
+    source: 'gacha',
+    rarity: 'rare',
+    bonus: { hp: 150 },
+    sprite: 'assets/sprites/eq-armor-abyss.png',
+  },
+  {
+    id: 'armor-solar',
+    slot: 'armor',
+    name: '태양 갑주',
+    source: 'gacha',
+    rarity: 'epic',
+    bonus: { hp: 230 },
+    sprite: 'assets/sprites/eq-armor-solar.png',
+  },
 ];
 
 const GACHA_EQUIPMENT = EQUIPMENT.filter(e => e.source === 'gacha');
 
 const ENEMY_TYPES = [
-  { id: 'bug',    name: '버그',   kind: 'bug', width: 58, height: 50 },
-  { id: 'mon-1',  name: '설인',   kind: 'tile', sprite: 'assets/sprites/enemy-1.png' },
-  { id: 'mon-2',  name: '나비',   kind: 'tile', sprite: 'assets/sprites/enemy-2.png' },
-  { id: 'mon-3',  name: '레드슬라임', kind: 'tile', sprite: 'assets/sprites/enemy-3.png' },
-  { id: 'mon-4',  name: '박쥐',   kind: 'tile', sprite: 'assets/sprites/enemy-4.png' },
-  { id: 'mon-5',  name: '물고기', kind: 'tile', sprite: 'assets/sprites/enemy-5.png' },
-  { id: 'mon-6',  name: '젤리',   kind: 'tile', sprite: 'assets/sprites/enemy-6.png' },
-  { id: 'mon-7',  name: '외눈이', kind: 'tile', sprite: 'assets/sprites/enemy-7.png' },
-  { id: 'mon-8',  name: '꽃게',   kind: 'tile', sprite: 'assets/sprites/enemy-8.png' },
-  { id: 'mon-9',  name: '유령',   kind: 'tile', sprite: 'assets/sprites/enemy-9.png' },
-  { id: 'mon-10', name: '거미',   kind: 'tile', sprite: 'assets/sprites/enemy-10.png' },
+  { id: 'bug', name: '버그', kind: 'bug', width: 58, height: 50 },
+  { id: 'mon-1', name: '설인', kind: 'tile', sprite: 'assets/sprites/enemy-1.png' },
+  { id: 'mon-2', name: '나비', kind: 'tile', sprite: 'assets/sprites/enemy-2.png' },
+  { id: 'mon-3', name: '레드슬라임', kind: 'tile', sprite: 'assets/sprites/enemy-3.png' },
+  { id: 'mon-4', name: '박쥐', kind: 'tile', sprite: 'assets/sprites/enemy-4.png' },
+  { id: 'mon-5', name: '물고기', kind: 'tile', sprite: 'assets/sprites/enemy-5.png' },
+  { id: 'mon-6', name: '젤리', kind: 'tile', sprite: 'assets/sprites/enemy-6.png' },
+  { id: 'mon-7', name: '외눈이', kind: 'tile', sprite: 'assets/sprites/enemy-7.png' },
+  { id: 'mon-8', name: '꽃게', kind: 'tile', sprite: 'assets/sprites/enemy-8.png' },
+  { id: 'mon-9', name: '유령', kind: 'tile', sprite: 'assets/sprites/enemy-9.png' },
+  { id: 'mon-10', name: '거미', kind: 'tile', sprite: 'assets/sprites/enemy-10.png' },
   { id: 'mon-11', name: '공벌레', kind: 'tile', sprite: 'assets/sprites/enemy-11.png' },
 ];
 
@@ -147,35 +640,145 @@ const IDLE_EVENTS = [
   { msg: '☕ 커피 브레이크! 잠시 속도가 빨라집니다', run: () => applyBuff('spdMul', 1.8, 6000) },
   { msg: '🔥 야근 발생... 잠시 느려집니다', run: () => applyBuff('spdMul', 0.5, 6000) },
   { msg: '🎉 커밋 완료! 보너스 EXP 획득', run: () => gainExp(6) },
-  { msg: '🚨 몬스터 무리 출현!', run: () => { spawnEnemy(); spawnEnemy(); } },
-  { msg: '🐛 버그 폭풍! 몬스터가 몰려온다', run: () => { for (let i = 0; i < 4; i++) spawnEnemy({ force: true }); } },
-  { msg: '💰 황금 몬스터 출현! 잡으면 EXP 대박', run: () => spawnEnemy({ golden: true, force: true }) },
+  {
+    msg: '🚨 몬스터 무리 출현!',
+    run: () => {
+      spawnEnemy();
+      spawnEnemy();
+    },
+  },
+  {
+    msg: '🐛 버그 폭풍! 몬스터가 몰려온다',
+    run: () => {
+      for (let i = 0; i < 4; i++) spawnEnemy({ force: true });
+    },
+  },
+  {
+    msg: '💰 황금 몬스터 출현! 잡으면 EXP 대박',
+    run: () => spawnEnemy({ golden: true, force: true }),
+  },
   { msg: '☄ 유성우가 내린다 (+10 EXP)', run: () => meteorShower() },
   { msg: '👾 보스 몬스터 출현!!', run: () => spawnEnemy({ boss: true, force: true }) },
-  { msg: '🪙 커밋 보너스! 코인을 획득했습니다', run: () => gainCoins(5 + Math.floor(Math.random() * 6)) },
+  {
+    msg: '🪙 커밋 보너스! 코인을 획득했습니다',
+    run: () => gainCoins(5 + Math.floor(Math.random() * 6)),
+  },
   { msg: '💪 강철 멘탈! 잠시 공격력이 상승합니다', run: () => applyBuff('atkMul', 1.6, 7000) },
   { msg: '😵 야근 버그로 잠시 공격력이 하락합니다', run: () => applyBuff('atkMul', 0.6, 6000) },
   { msg: '🌙 야식 타임! 체력을 회복합니다', run: () => healPercent(0.25) },
-  { msg: '📦 익명 후원! 코인을 받았습니다', run: () => gainCoins(8 + Math.floor(Math.random() * 12)) },
+  {
+    msg: '📦 익명 후원! 코인을 받았습니다',
+    run: () => gainCoins(8 + Math.floor(Math.random() * 12)),
+  },
   { msg: '🧹 대청소! 근처 몬스터가 모두 정리됩니다', run: () => clearAllEnemies() },
-  { msg: '🎁 알림 폭탄! 상자가 하나 더 나타났습니다', run: () => { if (!activeChest) spawnChest(); } },
-  { msg: '🌟 스트릭 보너스! 콤보가 증가합니다', run: () => { comboCount += 2; lastKillAt = Date.now(); floatText(`COMBO x${comboCount}!`, petPos.x + 10, petPos.y - 30, '#8b6bff', 'big'); } },
+  {
+    msg: '🎁 알림 폭탄! 상자가 하나 더 나타났습니다',
+    run: () => {
+      if (!activeChest) spawnChest();
+    },
+  },
+  {
+    msg: '🌟 스트릭 보너스! 콤보가 증가합니다',
+    run: () => {
+      comboCount += 2;
+      lastKillAt = Date.now();
+      floatText(`COMBO x${comboCount}!`, petPos.x + 10, petPos.y - 30, '#8b6bff', 'big');
+    },
+  },
 ];
 
 const ACHIEVEMENTS = [
-  { id: 'first-kill',    name: '첫 처치',        desc: '몬스터를 처음으로 처치했다',     icon: '⚔', check: s => s.monstersCaught >= 1 },
-  { id: 'kills-50',      name: '초보 사냥꾼',    desc: '몬스터 50마리 처치',             icon: '⚔', check: s => s.monstersCaught >= 50 },
-  { id: 'kills-200',     name: '베테랑 사냥꾼',  desc: '몬스터 200마리 처치',            icon: '⚔', check: s => s.monstersCaught >= 200 },
-  { id: 'kills-1000',    name: '전설의 사냥꾼',  desc: '몬스터 1000마리 처치',           icon: '⚔', check: s => s.monstersCaught >= 1000 },
-  { id: 'first-boss',    name: '보스 슬레이어',  desc: '보스 몬스터를 처음으로 처치했다', icon: '👾', check: s => s.bossesKilled >= 1 },
-  { id: 'boss-10',       name: '보스 헌터',      desc: '보스 몬스터 10마리 처치',        icon: '👾', check: s => s.bossesKilled >= 10 },
-  { id: 'first-purchase', name: '첫 쇼핑',       desc: '상점에서 아이템을 처음 구매했다', icon: '🛒', check: s => s.purchaseCount >= 1 },
-  { id: 'spend-500',     name: '알뜰 소비',      desc: '누적 500코인 사용',              icon: '🪙', check: s => s.totalCoinsSpent >= 500 },
-  { id: 'spend-3000',    name: '큰손',           desc: '누적 3000코인 사용',             icon: '🪙', check: s => s.totalCoinsSpent >= 3000 },
-  { id: 'first-chest',   name: '첫 상자',        desc: '상자를 처음으로 열었다',         icon: '🎁', check: s => s.chestsOpened >= 1 },
-  { id: 'chests-10',     name: '보물 사냥꾼',    desc: '상자 10개 개봉',                 icon: '🎁', check: s => s.chestsOpened >= 10 },
-  { id: 'level-50',      name: '중견 개발자',    desc: '레벨 50 달성',                   icon: '⭐', check: s => s.level >= 50 },
-  { id: 'level-100',     name: '레전드 개발자',  desc: '레벨 100 달성',                  icon: '⭐', check: s => s.level >= 100 },
+  {
+    id: 'first-kill',
+    name: '첫 처치',
+    desc: '몬스터를 처음으로 처치했다',
+    icon: '⚔',
+    check: s => s.monstersCaught >= 1,
+  },
+  {
+    id: 'kills-50',
+    name: '초보 사냥꾼',
+    desc: '몬스터 50마리 처치',
+    icon: '⚔',
+    check: s => s.monstersCaught >= 50,
+  },
+  {
+    id: 'kills-200',
+    name: '베테랑 사냥꾼',
+    desc: '몬스터 200마리 처치',
+    icon: '⚔',
+    check: s => s.monstersCaught >= 200,
+  },
+  {
+    id: 'kills-1000',
+    name: '전설의 사냥꾼',
+    desc: '몬스터 1000마리 처치',
+    icon: '⚔',
+    check: s => s.monstersCaught >= 1000,
+  },
+  {
+    id: 'first-boss',
+    name: '보스 슬레이어',
+    desc: '보스 몬스터를 처음으로 처치했다',
+    icon: '👾',
+    check: s => s.bossesKilled >= 1,
+  },
+  {
+    id: 'boss-10',
+    name: '보스 헌터',
+    desc: '보스 몬스터 10마리 처치',
+    icon: '👾',
+    check: s => s.bossesKilled >= 10,
+  },
+  {
+    id: 'first-purchase',
+    name: '첫 쇼핑',
+    desc: '상점에서 아이템을 처음 구매했다',
+    icon: '🛒',
+    check: s => s.purchaseCount >= 1,
+  },
+  {
+    id: 'spend-500',
+    name: '알뜰 소비',
+    desc: '누적 500코인 사용',
+    icon: '🪙',
+    check: s => s.totalCoinsSpent >= 500,
+  },
+  {
+    id: 'spend-3000',
+    name: '큰손',
+    desc: '누적 3000코인 사용',
+    icon: '🪙',
+    check: s => s.totalCoinsSpent >= 3000,
+  },
+  {
+    id: 'first-chest',
+    name: '첫 상자',
+    desc: '상자를 처음으로 열었다',
+    icon: '🎁',
+    check: s => s.chestsOpened >= 1,
+  },
+  {
+    id: 'chests-10',
+    name: '보물 사냥꾼',
+    desc: '상자 10개 개봉',
+    icon: '🎁',
+    check: s => s.chestsOpened >= 10,
+  },
+  {
+    id: 'level-50',
+    name: '중견 개발자',
+    desc: '레벨 50 달성',
+    icon: '⭐',
+    check: s => s.level >= 50,
+  },
+  {
+    id: 'level-100',
+    name: '레전드 개발자',
+    desc: '레벨 100 달성',
+    icon: '⭐',
+    check: s => s.level >= 100,
+  },
 ];
 
 const BUG_FRAME_WIDTH = 58;
@@ -321,7 +924,8 @@ function importSave() {
 
   try {
     const parsed = JSON.parse(decodeURIComponent(escape(atob(code))));
-    if (typeof parsed.level !== 'number' || parsed.level < 1 || !parsed.stats) throw new Error('invalid save');
+    if (typeof parsed.level !== 'number' || parsed.level < 1 || !parsed.stats)
+      throw new Error('invalid save');
 
     state = Object.assign(freshState(), parsed);
     checkAccessoryUnlocks(false);
@@ -429,7 +1033,9 @@ function flashSaveIndicator() {
   const el = document.getElementById('save-indicator');
   el.textContent = '💾 저장됨';
 
-  setTimeout(() => { el.textContent = '💾 자동저장 대기중'; }, 1200);
+  setTimeout(() => {
+    el.textContent = '💾 자동저장 대기중';
+  }, 1200);
 }
 
 // Lv50까지는 기존 지수 곡선 그대로(이미 익숙한 페이스 유지),
@@ -466,7 +1072,9 @@ function petAtk() {
 }
 
 function checkEquipmentUnlocks(announce = true) {
-  const newly = EQUIPMENT.filter(eq => state.level >= eq.unlockLevel && !state.equipment.includes(eq.id));
+  const newly = EQUIPMENT.filter(
+    eq => state.level >= eq.unlockLevel && !state.equipment.includes(eq.id),
+  );
   newly.forEach(eq => state.equipment.push(eq.id));
 
   if (!announce) {
@@ -522,14 +1130,20 @@ function toggleEquipmentVisibility() {
   state.hideEquipmentVisuals = !state.hideEquipmentVisuals;
   updateCombatGearVisibility();
   updateEquipVisibilityToggleLabel();
-  addLog(state.hideEquipmentVisuals ? '🚫 장비 겉모습을 숨깁니다 (능력치는 유지)' : '👁 장비 겉모습을 다시 표시합니다');
+  addLog(
+    state.hideEquipmentVisuals
+      ? '🚫 장비 겉모습을 숨깁니다 (능력치는 유지)'
+      : '👁 장비 겉모습을 다시 표시합니다',
+  );
   saveState();
 }
 
 function updateEquipVisibilityToggleLabel() {
   if (!equipVisibilityToggleEl) return;
 
-  equipVisibilityToggleEl.textContent = state.hideEquipmentVisuals ? '🚫 장비 겉모습 숨김' : '👁 장비 겉모습 표시';
+  equipVisibilityToggleEl.textContent = state.hideEquipmentVisuals
+    ? '🚫 장비 겉모습 숨김'
+    : '👁 장비 겉모습 표시';
   equipVisibilityToggleEl.classList.toggle('active', state.hideEquipmentVisuals);
 }
 
@@ -563,7 +1177,11 @@ function renderEquipmentGrid() {
 
       const name = document.createElement('div');
       name.className = 'acc-name';
-      name.textContent = unlocked ? eq.name : (eq.source === 'gacha' ? `??? (${eq.rarity})` : eq.name);
+      name.textContent = unlocked
+        ? eq.name
+        : eq.source === 'gacha'
+          ? `??? (${eq.rarity})`
+          : eq.name;
       card.appendChild(name);
 
       const bonusText = Object.entries(eq.bonus)
@@ -571,7 +1189,11 @@ function renderEquipmentGrid() {
         .join(' · ');
       const bonusEl = document.createElement('div');
       bonusEl.className = 'eq-bonus';
-      bonusEl.textContent = unlocked ? bonusText : (eq.source === 'gacha' ? '상자에서만 획득' : bonusText);
+      bonusEl.textContent = unlocked
+        ? bonusText
+        : eq.source === 'gacha'
+          ? '상자에서만 획득'
+          : bonusText;
       card.appendChild(bonusEl);
 
       const status = document.createElement('div');
@@ -649,8 +1271,8 @@ function meteorShower() {
       const m = document.createElement('div');
       m.className = 'meteor';
       m.textContent = '☄';
-      m.style.left = (bounds.width * 0.25 + Math.random() * bounds.width * 0.7) + 'px';
-      m.style.top = (Math.random() * bounds.height * 0.3) + 'px';
+      m.style.left = bounds.width * 0.25 + Math.random() * bounds.width * 0.7 + 'px';
+      m.style.top = Math.random() * bounds.height * 0.3 + 'px';
       stageEl.appendChild(m);
       setTimeout(() => m.remove(), 1250);
     }, i * 260);
@@ -726,13 +1348,19 @@ function queueUnlockPopup(acc) {
 }
 
 function processUnlockQueue() {
-  if (unlockQueue.length === 0) { unlockActive = false; return; }
+  if (unlockQueue.length === 0) {
+    unlockActive = false;
+    return;
+  }
   unlockActive = true;
   showUnlockCard(unlockQueue.shift());
 }
 
 function showUnlockCard(acc) {
-  if (!unlockOverlayEl) { processUnlockQueue(); return; }
+  if (!unlockOverlayEl) {
+    processUnlockQueue();
+    return;
+  }
   unlockOverlayEl.innerHTML = '';
 
   const isEquip = !!acc.slot;
@@ -799,7 +1427,9 @@ function showUnlockCard(acc) {
 
   const hint = document.createElement('div');
   hint.className = 'unlock-hint';
-  hint.textContent = isEquip ? '클릭하여 계속 · ⚔ 장비 버튼에서 장착' : '클릭하여 계속 · 📦 스킨 버튼에서 장착';
+  hint.textContent = isEquip
+    ? '클릭하여 계속 · ⚔ 장비 버튼에서 장착'
+    : '클릭하여 계속 · 📦 스킨 버튼에서 장착';
   card.appendChild(hint);
 
   unlockOverlayEl.appendChild(card);
@@ -942,12 +1572,18 @@ function renderAccessoryGrid() {
 
     const name = document.createElement('div');
     name.className = 'acc-name';
-    name.textContent = unlocked ? acc.name : (acc.rare ? '??? (희귀 드랍)' : acc.name);
+    name.textContent = unlocked ? acc.name : acc.rare ? '??? (희귀 드랍)' : acc.name;
     card.appendChild(name);
 
     const status = document.createElement('div');
     status.className = 'acc-status';
-    status.textContent = equipped ? '장착중' : (unlocked ? '클릭해서 장착' : (acc.rare ? '레벨업 시 확률 드랍' : `Lv.${acc.unlockLevel} 필요`));
+    status.textContent = equipped
+      ? '장착중'
+      : unlocked
+        ? '클릭해서 장착'
+        : acc.rare
+          ? '레벨업 시 확률 드랍'
+          : `Lv.${acc.unlockLevel} 필요`;
     card.appendChild(status);
 
     if (unlocked) card.addEventListener('click', () => equipAccessory(acc.id));
@@ -1040,19 +1676,20 @@ function renderShopGrid() {
     const afford = !isGacha && state.coins >= skin.price;
 
     const card = document.createElement('div');
-    card.className = 'acc-card' + (equipped ? ' equipped' : '') + (!owned && !afford ? ' locked' : '');
+    card.className =
+      'acc-card' + (equipped ? ' equipped' : '') + (!owned && !afford ? ' locked' : '');
 
     const preview = document.createElement('div');
     preview.className = 'acc-preview';
     const img = document.createElement('img');
     img.src = skin.body;
-    img.style.filter = (owned || !isGacha) ? '' : 'grayscale(1) brightness(.35)';
+    img.style.filter = owned || !isGacha ? '' : 'grayscale(1) brightness(.35)';
     preview.appendChild(img);
     card.appendChild(preview);
 
     const name = document.createElement('div');
     name.className = 'acc-name';
-    name.textContent = (owned || !isGacha) ? `${skin.icon} ${skin.name}` : `??? (${skin.rarity})`;
+    name.textContent = owned || !isGacha ? `${skin.icon} ${skin.name}` : `??? (${skin.rarity})`;
     card.appendChild(name);
 
     const status = document.createElement('div');
@@ -1088,7 +1725,11 @@ function buyEquipment(id) {
   state.totalCoinsSpent += item.price;
   state.equipment.push(id);
   addLog(`🛒 장비 구매: ${item.name} (-${item.price}🪙)`);
-  showToast(`${item.name} 구매 완료!`, { icon: '⚔', variant: 'gold', sub: '⚔ 장비 메뉴에서 장착하세요' });
+  showToast(`${item.name} 구매 완료!`, {
+    icon: '⚔',
+    variant: 'gold',
+    sub: '⚔ 장비 메뉴에서 장착하세요',
+  });
   renderShopEquipGrid();
   renderEquipmentGrid();
   checkAchievements();
@@ -1105,7 +1746,8 @@ function renderShopEquipGrid() {
     const afford = state.coins >= eq.price;
 
     const card = document.createElement('div');
-    card.className = 'acc-card' + (equipped ? ' equipped' : '') + (!owned && !afford ? ' locked' : '');
+    card.className =
+      'acc-card' + (equipped ? ' equipped' : '') + (!owned && !afford ? ' locked' : '');
 
     const preview = document.createElement('div');
     preview.className = 'acc-preview eq-preview';
@@ -1130,11 +1772,17 @@ function renderShopEquipGrid() {
     const status = document.createElement('div');
     status.className = 'acc-status';
     status.textContent = owned
-      ? (equipped ? '장착중' : '보유 중 · 클릭해서 장착')
+      ? equipped
+        ? '장착중'
+        : '보유 중 · 클릭해서 장착'
       : `${eq.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`;
     card.appendChild(status);
 
-    if (owned) card.addEventListener('click', () => { equipItem(eq.id); renderShopEquipGrid(); });
+    if (owned)
+      card.addEventListener('click', () => {
+        equipItem(eq.id);
+        renderShopEquipGrid();
+      });
     else if (afford) card.addEventListener('click', () => buyEquipment(eq.id));
 
     shopEquipGridEl.appendChild(card);
@@ -1247,7 +1895,10 @@ function applyBuff(key, mul, duration) {
 function buffMul(key) {
   const b = buffs[key];
   if (!b) return 1;
-  if (Date.now() > b.until) { delete buffs[key]; return 1; }
+  if (Date.now() > b.until) {
+    delete buffs[key];
+    return 1;
+  }
 
   return b.mul;
 }
@@ -1263,7 +1914,7 @@ function spawnEnemy(opts = {}) {
   if (enemies.length >= MAX_ENEMIES && !opts.force) return;
 
   // 황금/보스는 스프라이트 시트(bug) 대신 단일 타일만 사용 (틴트·확대가 깔끔함)
-  const pool = (opts.golden || opts.boss) ? ENEMY_TYPES.filter(t => t.kind === 'tile') : ENEMY_TYPES;
+  const pool = opts.golden || opts.boss ? ENEMY_TYPES.filter(t => t.kind === 'tile') : ENEMY_TYPES;
   const type = pool[Math.floor(Math.random() * pool.length)];
   const bounds = stageEl.getBoundingClientRect();
   const scale = opts.boss ? 1.9 : 1;
@@ -1304,9 +1955,15 @@ function spawnEnemy(opts = {}) {
   const baseHp = 8 + state.level * 3;
   const maxHp = Math.round(baseHp * (opts.boss ? 6 : opts.golden ? 2 : 1));
   enemies.push({
-    wrap, sprite, hpfill,
-    x, y, w, h,
-    hp: maxHp, maxHp,
+    wrap,
+    sprite,
+    hpfill,
+    x,
+    y,
+    w,
+    h,
+    hp: maxHp,
+    maxHp,
     atk: Math.round((1 + Math.floor(state.level * 0.7)) * (opts.boss ? 1.6 : 1)),
     attackTimer: Math.random() * ENEMY_ATTACK_COOLDOWN,
     expMul: opts.boss ? 3 : opts.golden ? 4 : 1,
@@ -1332,7 +1989,8 @@ function spawnChest() {
   if (activeChest) return;
 
   const bounds = stageEl.getBoundingClientRect();
-  const w = 32, h = 26;
+  const w = 32,
+    h = 26;
   const x = Math.random() * Math.max(20, bounds.width - w);
   const y = Math.random() * Math.max(20, bounds.height - h);
 
@@ -1364,7 +2022,10 @@ function openChest() {
 }
 
 function showGachaRoll() {
-  if (!gachaRollOverlayEl) { grantGachaReward(rollGacha()); return; }
+  if (!gachaRollOverlayEl) {
+    grantGachaReward(rollGacha());
+    return;
+  }
 
   gachaRollOverlayEl.classList.add('show');
   gachaRollOverlayEl.setAttribute('aria-hidden', 'false');
@@ -1381,7 +2042,9 @@ function rollGacha() {
     ...GACHA_EQUIPMENT.map(item => ({ kind: 'equip', item })),
     ...GACHA_SKINS.map(item => ({ kind: 'skin', item })),
   ];
-  const weighted = pool.flatMap(entry => Array(GACHA_RARITY_WEIGHTS[entry.item.rarity] || 10).fill(entry));
+  const weighted = pool.flatMap(entry =>
+    Array(GACHA_RARITY_WEIGHTS[entry.item.rarity] || 10).fill(entry),
+  );
 
   return weighted[Math.floor(Math.random() * weighted.length)];
 }
@@ -1389,7 +2052,8 @@ function rollGacha() {
 function grantGachaReward({ kind, item }) {
   state.chestsOpened += 1;
 
-  const owned = kind === 'equip' ? state.equipment.includes(item.id) : state.skins.includes(item.id);
+  const owned =
+    kind === 'equip' ? state.equipment.includes(item.id) : state.skins.includes(item.id);
 
   if (owned) {
     const refund = GACHA_DUPLICATE_REFUND[item.rarity] || 15;
@@ -1436,9 +2100,14 @@ let lastKillAt = 0;
 function killEnemy(target) {
   const cx = target.x + target.w / 2;
   const cy = target.y + target.h / 2;
-  spawnParticles(cx, cy, target.isGolden
-    ? ['#ffd54a', '#fff2b0', '#f0a878']
-    : ['#ff6b6b', '#ffd54a', '#7fd88f', '#57d7f2'], target.isBoss ? 22 : 12);
+  spawnParticles(
+    cx,
+    cy,
+    target.isGolden
+      ? ['#ffd54a', '#fff2b0', '#f0a878']
+      : ['#ff6b6b', '#ffd54a', '#7fd88f', '#57d7f2'],
+    target.isBoss ? 22 : 12,
+  );
 
   if (target.isBoss) {
     floatText(`👾 보스 ${target.type.name} 격파!!`, target.x, target.y - 30, '#ff9f43', 'big');
@@ -1458,14 +2127,16 @@ function killEnemy(target) {
   lastKillAt = now;
   if (comboCount >= 2) floatText(`COMBO x${comboCount}!`, cx - 24, target.y - 48, '#8b6bff', 'big');
 
-  const exp = Math.floor((3 + target.maxHp / 4) * (target.expMul || 1)) + (comboCount >= 2 ? comboCount : 0);
+  const exp =
+    Math.floor((3 + target.maxHp / 4) * (target.expMul || 1)) + (comboCount >= 2 ? comboCount : 0);
   gainExp(exp);
 
   const coinGain = target.isBoss ? 12 : target.isGolden ? 6 : 1 + Math.floor(Math.random() * 2);
   gainCoins(coinGain, cx, target.y - 42);
 
   if (target.isBoss) addLog(`👾 보스 ${target.type.name} 격파!! (+${exp} EXP · +${coinGain}🪙)`);
-  else if (target.isGolden) addLog(`💰 황금 ${target.type.name} 처치! EXP 대박 (+${exp} EXP · +${coinGain}🪙)`);
+  else if (target.isGolden)
+    addLog(`💰 황금 ${target.type.name} 처치! EXP 대박 (+${exp} EXP · +${coinGain}🪙)`);
   else addLog(`⚔ ${target.type.name} 처치! (총 ${state.monstersCaught}마리)`);
 
   checkAchievements();
@@ -1507,7 +2178,9 @@ function isKnockedOut() {
 function scatterEnemiesOnDeath() {
   const cx = petPos.x + 48;
   const cy = petPos.y + 30;
-  const nearby = enemies.filter(e => Math.hypot(e.x + e.w / 2 - cx, e.y + e.h / 2 - cy) <= DEATH_SCATTER_RADIUS);
+  const nearby = enemies.filter(
+    e => Math.hypot(e.x + e.w / 2 - cx, e.y + e.h / 2 - cy) <= DEATH_SCATTER_RADIUS,
+  );
 
   if (!nearby.length) return;
 
@@ -1562,11 +2235,22 @@ function applyDeathPenalty() {
   floatText('💫 그로기...', petPos.x + 10, petPos.y - 24, '#a78bfa');
 
   if (leveledDown) {
-    addLog(`💀 부활... EXP -${loss} → 레벨 하락! Lv.${state.level} · ${GROGGY_DURATION_MS / 1000}초 그로기`);
-    showToast(`부활 페널티: Lv.${state.level}로 하락!`, { icon: '💀', variant: 'rare', sub: `EXP -${loss} · ${GROGGY_DURATION_MS / 1000}초간 공격·속도 50%`, duration: 4200 });
+    addLog(
+      `💀 부활... EXP -${loss} → 레벨 하락! Lv.${state.level} · ${GROGGY_DURATION_MS / 1000}초 그로기`,
+    );
+    showToast(`부활 페널티: Lv.${state.level}로 하락!`, {
+      icon: '💀',
+      variant: 'rare',
+      sub: `EXP -${loss} · ${GROGGY_DURATION_MS / 1000}초간 공격·속도 50%`,
+      duration: 4200,
+    });
   } else {
     addLog(`💀 부활... EXP -${loss} · ${GROGGY_DURATION_MS / 1000}초 그로기 (공격·속도 50%)`);
-    showToast(`부활 페널티: EXP -${loss}`, { icon: '💀', sub: `${GROGGY_DURATION_MS / 1000}초간 공격·속도 50%`, duration: 4200 });
+    showToast(`부활 페널티: EXP -${loss}`, {
+      icon: '💀',
+      sub: `${GROGGY_DURATION_MS / 1000}초간 공격·속도 50%`,
+      duration: 4200,
+    });
   }
 
   saveState();
@@ -1578,7 +2262,10 @@ function nearestEnemy() {
 
   enemies.forEach(e => {
     const d = Math.hypot(e.x + e.w / 2 - (petPos.x + 48), e.y + e.h / 2 - (petPos.y + 30));
-    if (d < bestDist) { bestDist = d; best = e; }
+    if (d < bestDist) {
+      bestDist = d;
+      best = e;
+    }
   });
 
   return { target: best, dist: bestDist };
@@ -1612,8 +2299,8 @@ function updateCombat(dt) {
     const d = Math.hypot(e.x + e.w / 2 - (petPos.x + 48), e.y + e.h / 2 - (petPos.y + 30));
 
     if (d > ENEMY_ATTACK_RANGE) {
-      const dirX = (petPos.x + 48) - (e.x + e.w / 2);
-      const dirY = (petPos.y + 30) - (e.y + e.h / 2);
+      const dirX = petPos.x + 48 - (e.x + e.w / 2);
+      const dirY = petPos.y + 30 - (e.y + e.h / 2);
       const len = Math.hypot(dirX, dirY) || 1;
       const speed = ENEMY_MOVE_SPEED * (e.speedMul || 1);
       e.x += (dirX / len) * speed * dt;
@@ -1673,7 +2360,10 @@ function updateIdleAnimations() {
   }
 
   if (isCoding()) {
-    if (enemies.length > 0) { stopCoding(); return; }
+    if (enemies.length > 0) {
+      stopCoding();
+      return;
+    }
 
     if (now >= nextGlyphAt) {
       nextGlyphAt = now + 700 + Math.random() * 500;
@@ -1685,7 +2375,6 @@ function updateIdleAnimations() {
     pickNewTarget();
   }
 }
-
 
 function updateMovement(dt) {
   if (isKnockedOut()) return;
@@ -1736,23 +2425,31 @@ function updateHUD() {
   const hpBonus = equipBonus('hp');
 
   document.getElementById('level').textContent = state.level;
-  document.getElementById('exp-text').textContent = `${Math.floor(state.exp)} / ${expToNext(state.level)}`;
-  document.getElementById('exp-fill').style.width = `${(state.exp / expToNext(state.level)) * 100}%`;
+  document.getElementById('exp-text').textContent =
+    `${Math.floor(state.exp)} / ${expToNext(state.level)}`;
+  document.getElementById('exp-fill').style.width =
+    `${(state.exp / expToNext(state.level)) * 100}%`;
   document.getElementById('hp-text').textContent = `${Math.ceil(state.curHp)} / ${hpMax}`;
   document.getElementById('hp-fill').style.width = `${(state.curHp / hpMax) * 100}%`;
 
   document.getElementById('sd-level').textContent = state.level;
-  document.getElementById('sd-exp').textContent = `${Math.floor(state.exp)} / ${expToNext(state.level)}`;
-  document.getElementById('sd-hp').textContent = `${Math.ceil(state.curHp)} / ${hpMax}` + (hpBonus ? ` (+${hpBonus})` : '');
-  document.getElementById('sd-atk').textContent = atkBonus ? `${state.stats.atk} (+${atkBonus})` : state.stats.atk;
+  document.getElementById('sd-exp').textContent =
+    `${Math.floor(state.exp)} / ${expToNext(state.level)}`;
+  document.getElementById('sd-hp').textContent =
+    `${Math.ceil(state.curHp)} / ${hpMax}` + (hpBonus ? ` (+${hpBonus})` : '');
+  document.getElementById('sd-atk').textContent = atkBonus
+    ? `${state.stats.atk} (+${atkBonus})`
+    : state.stats.atk;
   document.getElementById('sd-def').textContent = equipBonus('def');
   document.getElementById('sd-spd').textContent = state.stats.spd.toFixed(1);
   document.getElementById('sd-luk').textContent = state.stats.luk;
   document.getElementById('sd-caught').textContent = state.monstersCaught;
-  document.getElementById('sd-acc').textContent = `${state.accessories.length} / ${ACCESSORIES.length}`;
+  document.getElementById('sd-acc').textContent =
+    `${state.accessories.length} / ${ACCESSORIES.length}`;
   document.getElementById('sd-eq').textContent = `${state.equipment.length} / ${EQUIPMENT.length}`;
   document.getElementById('sd-chests').textContent = state.chestsOpened;
-  document.getElementById('sd-achievements').textContent = `${state.achievements.length} / ${ACHIEVEMENTS.length}`;
+  document.getElementById('sd-achievements').textContent =
+    `${state.achievements.length} / ${ACHIEVEMENTS.length}`;
   document.getElementById('sd-coins').textContent = state.coins;
   document.getElementById('coin-display').textContent = `🪙 ${state.coins}`;
   document.getElementById('shop-coin-balance').textContent = state.coins;
@@ -1775,7 +2472,9 @@ function grantOfflineProgress() {
 
   const idleExp = Math.floor(cappedSeconds / 3);
   gainExp(idleExp);
-  addLog(`🌙 자리를 비운 사이 ${Math.floor(cappedSeconds / 60)}분 동안 성장했습니다 (+${idleExp} EXP)`);
+  addLog(
+    `🌙 자리를 비운 사이 ${Math.floor(cappedSeconds / 60)}분 동안 성장했습니다 (+${idleExp} EXP)`,
+  );
 }
 
 let lastPetClick = 0;
@@ -1819,7 +2518,11 @@ function openPopup(name) {
   if (name === 'terminal') logEl.scrollTop = logEl.scrollHeight;
 
   // 상점은 코인 잔액에 따라 구매 가능 여부가 바뀌므로 열 때마다 새로 그린다
-  if (name === 'shop') { renderShopGrid(); renderShopEquipGrid(); renderStatUpgradeGrid(); }
+  if (name === 'shop') {
+    renderShopGrid();
+    renderShopEquipGrid();
+    renderStatUpgradeGrid();
+  }
 }
 
 function closePopup() {
@@ -1843,8 +2546,12 @@ document.addEventListener('keydown', e => {
 /* ---------- 상점 내부 탭 (스탯 강화 / 스킨 / 장비) ---------- */
 
 function openShopTab(name) {
-  document.querySelectorAll('.shop-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.shopTab === name));
-  document.querySelectorAll('.shop-tab-panel').forEach(el => el.classList.toggle('hidden', el.id !== `shop-panel-${name}`));
+  document
+    .querySelectorAll('.shop-tab')
+    .forEach(btn => btn.classList.toggle('active', btn.dataset.shopTab === name));
+  document
+    .querySelectorAll('.shop-tab-panel')
+    .forEach(el => el.classList.toggle('hidden', el.id !== `shop-panel-${name}`));
 }
 
 document.querySelectorAll('.shop-tab').forEach(btn => {
@@ -1882,7 +2589,9 @@ function scheduleNextEvent() {
     const event = IDLE_EVENTS[Math.floor(Math.random() * IDLE_EVENTS.length)];
     addLog(event.msg);
     const sp = event.msg.indexOf(' ');
-    showToast(sp > 0 ? event.msg.slice(sp + 1) : event.msg, { icon: sp > 0 ? event.msg.slice(0, sp) : '›' });
+    showToast(sp > 0 ? event.msg.slice(sp + 1) : event.msg, {
+      icon: sp > 0 ? event.msg.slice(0, sp) : '›',
+    });
     event.run();
     scheduleNextEvent();
   }, delay);
@@ -1912,7 +2621,8 @@ function loop(now) {
 
   chestSpawnCountdown -= dt;
   if (chestSpawnCountdown <= 0 && !activeChest) {
-    chestSpawnCountdown = CHEST_MIN_INTERVAL_S + Math.random() * (CHEST_MAX_INTERVAL_S - CHEST_MIN_INTERVAL_S);
+    chestSpawnCountdown =
+      CHEST_MIN_INTERVAL_S + Math.random() * (CHEST_MAX_INTERVAL_S - CHEST_MIN_INTERVAL_S);
     spawnChest();
   }
 
@@ -1933,7 +2643,7 @@ function init() {
   addLog('$ node growth.ts --mode=idle');
   addLog('claude-pet 이(가) 자라기 시작했습니다.');
 
-  checkAccessoryUnlocks(false);   // 이미 도달한 레벨의 액세서리를 로드 시점에 조용히 소급 해금
+  checkAccessoryUnlocks(false); // 이미 도달한 레벨의 액세서리를 로드 시점에 조용히 소급 해금
   checkEquipmentUnlocks(false);
 
   if (typeof state.curHp !== 'number' || state.curHp <= 0) state.curHp = maxHp();
@@ -1974,7 +2684,9 @@ function init() {
     document.getElementById('save-indicator').textContent = '⚠ 자동저장 불가 (브라우저 설정)';
     addLog('⚠ 저장소를 사용할 수 없습니다. 시크릿 모드/쿠키 차단 여부를 확인하세요.');
     showToast('저장소를 사용할 수 없습니다', {
-      icon: '⚠', variant: 'rare', duration: 6500,
+      icon: '⚠',
+      variant: 'rare',
+      duration: 6500,
       sub: '시크릿 모드/쿠키 차단 확인 · 스탯 팝업에서 세이브 코드로 백업 가능',
     });
   }
