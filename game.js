@@ -1,4 +1,6 @@
 const SAVE_KEY = 'claudePetGame.save.v3';
+const GAME_VERSION = '2026.07.03-1';
+const VERSION_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
 // 시크릿 모드·쿠키 전면 차단 환경에서는 localStorage 접근 자체가 throw → 안전 래퍼
 // (loadState가 파일 상단의 `let state = loadState()`에서 즉시 실행되므로 그보다 먼저 선언)
@@ -46,7 +48,23 @@ const PET_SKINS = [
   { id: 'rich',    name: '부자 클로드',       price: 300, icon: '💰', body: 'assets/sprites/pet-body-rich.png',   armLeft: 'assets/sprites/pet-arm-left-rich.png',   armRight: 'assets/sprites/pet-arm-right-rich.png' },
   { id: 'neon',    name: '네온 클로드',       price: 400, icon: '⚡', body: 'assets/sprites/pet-body-neon.png',   armLeft: 'assets/sprites/pet-arm-left-neon.png',   armRight: 'assets/sprites/pet-arm-right-neon.png' },
   { id: 'matrix',  name: '매트릭스 클로드',   price: 550, icon: '🟢', body: 'assets/sprites/pet-body-matrix.png', armLeft: 'assets/sprites/pet-arm-left-matrix.png', armRight: 'assets/sprites/pet-arm-right-matrix.png' },
+  // Lv50~100 구간 코인 소비처 확장
+  { id: 'crimson',  name: '진홍 클로드',   price: 700,  icon: '🔴', body: 'assets/sprites/pet-body-crimson.png',  armLeft: 'assets/sprites/pet-arm-left-crimson.png',  armRight: 'assets/sprites/pet-arm-right-crimson.png' },
+  { id: 'frost',    name: '서리 클로드',   price: 800,  icon: '❄',  body: 'assets/sprites/pet-body-frost.png',    armLeft: 'assets/sprites/pet-arm-left-frost.png',    armRight: 'assets/sprites/pet-arm-right-frost.png' },
+  { id: 'obsidian', name: '흑요석 클로드', price: 900,  icon: '⬛', body: 'assets/sprites/pet-body-obsidian.png', armLeft: 'assets/sprites/pet-arm-left-obsidian.png', armRight: 'assets/sprites/pet-arm-right-obsidian.png' },
+  { id: 'prism',    name: '프리즘 클로드', price: 1000, icon: '💎', body: 'assets/sprites/pet-body-prism.png',    armLeft: 'assets/sprites/pet-arm-left-prism.png',    armRight: 'assets/sprites/pet-arm-right-prism.png' },
+  // 상자(가챠) 전용 — 상점 구매 불가, spawnChest()로만 획득
+  { id: 'ghost',  name: '유령 클로드', source: 'gacha', rarity: 'common', icon: '👻', body: 'assets/sprites/pet-body-ghost.png',  armLeft: 'assets/sprites/pet-arm-left-ghost.png',  armRight: 'assets/sprites/pet-arm-right-ghost.png' },
+  { id: 'lava',   name: '용암 클로드', source: 'gacha', rarity: 'common', icon: '🌋', body: 'assets/sprites/pet-body-lava.png',   armLeft: 'assets/sprites/pet-arm-left-lava.png',   armRight: 'assets/sprites/pet-arm-right-lava.png' },
+  { id: 'ice',    name: '빙하 클로드', source: 'gacha', rarity: 'rare',   icon: '🧊', body: 'assets/sprites/pet-body-ice.png',    armLeft: 'assets/sprites/pet-arm-left-ice.png',    armRight: 'assets/sprites/pet-arm-right-ice.png' },
+  { id: 'toxic',  name: '맹독 클로드', source: 'gacha', rarity: 'rare',   icon: '☣',  body: 'assets/sprites/pet-body-toxic.png',  armLeft: 'assets/sprites/pet-arm-left-toxic.png',  armRight: 'assets/sprites/pet-arm-right-toxic.png' },
+  { id: 'galaxy', name: '은하 클로드', source: 'gacha', rarity: 'epic',   icon: '🌌', body: 'assets/sprites/pet-body-galaxy.png', armLeft: 'assets/sprites/pet-arm-left-galaxy.png', armRight: 'assets/sprites/pet-arm-right-galaxy.png' },
+  { id: 'gold',   name: '황금 클로드', source: 'gacha', rarity: 'epic',   icon: '🏆', body: 'assets/sprites/pet-body-gold.png',   armLeft: 'assets/sprites/pet-arm-left-gold.png',   armRight: 'assets/sprites/pet-arm-right-gold.png' },
 ];
+
+const GACHA_SKINS = PET_SKINS.filter(s => s.source === 'gacha');
+const GACHA_RARITY_WEIGHTS = { common: 55, rare: 30, epic: 15 };
+const GACHA_DUPLICATE_REFUND = { common: 15, rare: 35, epic: 80 };
 
 const STAT_UPGRADES = [
   { id: 'hp',  label: '❤ HP',  icon: '❤', step: 5,   basePrice: 8,  priceGrowth: 1.16 },
@@ -80,11 +98,35 @@ const EQUIPMENT = [
   { id: 'armor-mythril',   slot: 'armor', name: '미스릴 갑옷',       unlockLevel: 18, bonus: { hp: 70 },  sprite: 'assets/sprites/eq-armor-mythril.png' },
   { id: 'armor-dragon',    slot: 'armor', name: '드래곤 스케일 갑주', unlockLevel: 22, bonus: { hp: 110 }, sprite: 'assets/sprites/eq-armor-dragon.png' },
   { id: 'armor-celestial', slot: 'armor', name: '천상의 갑주',        unlockLevel: 34, bonus: { hp: 165 }, sprite: 'assets/sprites/eq-armor-celestial.png' },
+  // Lv50~100 구간 확장 (레벨 100 밸런스 조정과 함께 추가)
+  { id: 'sword-quantum',   slot: 'weapon', name: '퀀텀 세이버',      unlockLevel: 50, bonus: { atk: 36 }, sprite: 'assets/sprites/eq-sword-quantum.png' },
+  { id: 'sword-eclipse',   slot: 'weapon', name: '이클립스 블레이드', unlockLevel: 65, bonus: { atk: 46 }, sprite: 'assets/sprites/eq-sword-eclipse.png' },
+  { id: 'sword-infinity',  slot: 'weapon', name: '인피니티 엣지',    unlockLevel: 80, bonus: { atk: 58 }, sprite: 'assets/sprites/eq-sword-infinity.png' },
+  { id: 'shield-titan',    slot: 'shield', name: '타이탄 방패',      unlockLevel: 55, bonus: { def: 12 }, sprite: 'assets/sprites/eq-shield-titan.png' },
+  { id: 'shield-phantom',  slot: 'shield', name: '팬텀 방패',        unlockLevel: 70, bonus: { def: 15 }, sprite: 'assets/sprites/eq-shield-phantom.png' },
+  { id: 'shield-eternal',  slot: 'shield', name: '이터널 방패',      unlockLevel: 85, bonus: { def: 19 }, sprite: 'assets/sprites/eq-shield-eternal.png' },
+  { id: 'armor-drakonis',  slot: 'armor',  name: '드라코니스 갑주',  unlockLevel: 50, bonus: { hp: 220 }, sprite: 'assets/sprites/eq-armor-drakonis.png' },
+  { id: 'armor-celestion', slot: 'armor',  name: '셀레스티온 갑주',  unlockLevel: 68, bonus: { hp: 290 }, sprite: 'assets/sprites/eq-armor-celestion.png' },
+  { id: 'armor-omega',     slot: 'armor',  name: '오메가 갑주',      unlockLevel: 88, bonus: { hp: 370 }, sprite: 'assets/sprites/eq-armor-omega.png' },
   // 상점 구매 전용 (레벨 무관, 코인으로 구매)
   { id: 'sword-diamond',  slot: 'weapon', name: '다이아몬드 소드', price: 450, bonus: { atk: 24 },  sprite: 'assets/sprites/eq-sword-diamond.png' },
   { id: 'shield-crystal', slot: 'shield', name: '크리스탈 방패',   price: 380, bonus: { def: 7 },   sprite: 'assets/sprites/eq-shield-crystal.png' },
   { id: 'armor-phoenix',  slot: 'armor',  name: '불사조 갑옷',     price: 550, bonus: { hp: 140 },  sprite: 'assets/sprites/eq-armor-phoenix.png' },
+  { id: 'shield-runic',   slot: 'shield', name: '룬 방패',         price: 700, bonus: { def: 11 },  sprite: 'assets/sprites/eq-shield-runic.png' },
+  { id: 'armor-nebula',   slot: 'armor',  name: '네뷸라 갑주',     price: 900, bonus: { hp: 300 },  sprite: 'assets/sprites/eq-armor-nebula.png' },
+  // 상자(가챠) 전용 — 레벨/상점 무관, spawnChest()로 획득. 희귀도는 GACHA_RARITY_WEIGHTS 참조
+  { id: 'sword-storm',   slot: 'weapon', name: '폭풍의 검',    source: 'gacha', rarity: 'common', bonus: { atk: 16 }, sprite: 'assets/sprites/eq-sword-storm.png' },
+  { id: 'sword-inferno', slot: 'weapon', name: '인페르노 소드', source: 'gacha', rarity: 'rare',   bonus: { atk: 26 }, sprite: 'assets/sprites/eq-sword-inferno.png' },
+  { id: 'sword-nova',    slot: 'weapon', name: '노바 세이버',   source: 'gacha', rarity: 'epic',   bonus: { atk: 40 }, sprite: 'assets/sprites/eq-sword-nova.png' },
+  { id: 'shield-coral',   slot: 'shield', name: '산호 방패',   source: 'gacha', rarity: 'common', bonus: { def: 5 },  sprite: 'assets/sprites/eq-shield-coral.png' },
+  { id: 'shield-thunder', slot: 'shield', name: '뇌전 방패',   source: 'gacha', rarity: 'rare',   bonus: { def: 8 },  sprite: 'assets/sprites/eq-shield-thunder.png' },
+  { id: 'shield-cosmic',  slot: 'shield', name: '코스믹 방패', source: 'gacha', rarity: 'epic',   bonus: { def: 13 }, sprite: 'assets/sprites/eq-shield-cosmic.png' },
+  { id: 'armor-jade',  slot: 'armor', name: '옥 갑옷',     source: 'gacha', rarity: 'common', bonus: { hp: 90 },  sprite: 'assets/sprites/eq-armor-jade.png' },
+  { id: 'armor-abyss', slot: 'armor', name: '심연 갑주',   source: 'gacha', rarity: 'rare',   bonus: { hp: 150 }, sprite: 'assets/sprites/eq-armor-abyss.png' },
+  { id: 'armor-solar', slot: 'armor', name: '태양 갑주',   source: 'gacha', rarity: 'epic',   bonus: { hp: 230 }, sprite: 'assets/sprites/eq-armor-solar.png' },
 ];
+
+const GACHA_EQUIPMENT = EQUIPMENT.filter(e => e.source === 'gacha');
 
 const ENEMY_TYPES = [
   { id: 'bug',    name: '버그',   kind: 'bug', width: 58, height: 50 },
@@ -93,6 +135,12 @@ const ENEMY_TYPES = [
   { id: 'mon-3',  name: '레드슬라임', kind: 'tile', sprite: 'assets/sprites/enemy-3.png' },
   { id: 'mon-4',  name: '박쥐',   kind: 'tile', sprite: 'assets/sprites/enemy-4.png' },
   { id: 'mon-5',  name: '물고기', kind: 'tile', sprite: 'assets/sprites/enemy-5.png' },
+  { id: 'mon-6',  name: '젤리',   kind: 'tile', sprite: 'assets/sprites/enemy-6.png' },
+  { id: 'mon-7',  name: '외눈이', kind: 'tile', sprite: 'assets/sprites/enemy-7.png' },
+  { id: 'mon-8',  name: '꽃게',   kind: 'tile', sprite: 'assets/sprites/enemy-8.png' },
+  { id: 'mon-9',  name: '유령',   kind: 'tile', sprite: 'assets/sprites/enemy-9.png' },
+  { id: 'mon-10', name: '거미',   kind: 'tile', sprite: 'assets/sprites/enemy-10.png' },
+  { id: 'mon-11', name: '공벌레', kind: 'tile', sprite: 'assets/sprites/enemy-11.png' },
 ];
 
 const IDLE_EVENTS = [
@@ -105,6 +153,29 @@ const IDLE_EVENTS = [
   { msg: '☄ 유성우가 내린다 (+10 EXP)', run: () => meteorShower() },
   { msg: '👾 보스 몬스터 출현!!', run: () => spawnEnemy({ boss: true, force: true }) },
   { msg: '🪙 커밋 보너스! 코인을 획득했습니다', run: () => gainCoins(5 + Math.floor(Math.random() * 6)) },
+  { msg: '💪 강철 멘탈! 잠시 공격력이 상승합니다', run: () => applyBuff('atkMul', 1.6, 7000) },
+  { msg: '😵 야근 버그로 잠시 공격력이 하락합니다', run: () => applyBuff('atkMul', 0.6, 6000) },
+  { msg: '🌙 야식 타임! 체력을 회복합니다', run: () => healPercent(0.25) },
+  { msg: '📦 익명 후원! 코인을 받았습니다', run: () => gainCoins(8 + Math.floor(Math.random() * 12)) },
+  { msg: '🧹 대청소! 근처 몬스터가 모두 정리됩니다', run: () => clearAllEnemies() },
+  { msg: '🎁 알림 폭탄! 상자가 하나 더 나타났습니다', run: () => { if (!activeChest) spawnChest(); } },
+  { msg: '🌟 스트릭 보너스! 콤보가 증가합니다', run: () => { comboCount += 2; lastKillAt = Date.now(); floatText(`COMBO x${comboCount}!`, petPos.x + 10, petPos.y - 30, '#8b6bff', 'big'); } },
+];
+
+const ACHIEVEMENTS = [
+  { id: 'first-kill',    name: '첫 처치',        desc: '몬스터를 처음으로 처치했다',     icon: '⚔', check: s => s.monstersCaught >= 1 },
+  { id: 'kills-50',      name: '초보 사냥꾼',    desc: '몬스터 50마리 처치',             icon: '⚔', check: s => s.monstersCaught >= 50 },
+  { id: 'kills-200',     name: '베테랑 사냥꾼',  desc: '몬스터 200마리 처치',            icon: '⚔', check: s => s.monstersCaught >= 200 },
+  { id: 'kills-1000',    name: '전설의 사냥꾼',  desc: '몬스터 1000마리 처치',           icon: '⚔', check: s => s.monstersCaught >= 1000 },
+  { id: 'first-boss',    name: '보스 슬레이어',  desc: '보스 몬스터를 처음으로 처치했다', icon: '👾', check: s => s.bossesKilled >= 1 },
+  { id: 'boss-10',       name: '보스 헌터',      desc: '보스 몬스터 10마리 처치',        icon: '👾', check: s => s.bossesKilled >= 10 },
+  { id: 'first-purchase', name: '첫 쇼핑',       desc: '상점에서 아이템을 처음 구매했다', icon: '🛒', check: s => s.purchaseCount >= 1 },
+  { id: 'spend-500',     name: '알뜰 소비',      desc: '누적 500코인 사용',              icon: '🪙', check: s => s.totalCoinsSpent >= 500 },
+  { id: 'spend-3000',    name: '큰손',           desc: '누적 3000코인 사용',             icon: '🪙', check: s => s.totalCoinsSpent >= 3000 },
+  { id: 'first-chest',   name: '첫 상자',        desc: '상자를 처음으로 열었다',         icon: '🎁', check: s => s.chestsOpened >= 1 },
+  { id: 'chests-10',     name: '보물 사냥꾼',    desc: '상자 10개 개봉',                 icon: '🎁', check: s => s.chestsOpened >= 10 },
+  { id: 'level-50',      name: '중견 개발자',    desc: '레벨 50 달성',                   icon: '⭐', check: s => s.level >= 50 },
+  { id: 'level-100',     name: '레전드 개발자',  desc: '레벨 100 달성',                  icon: '⭐', check: s => s.level >= 100 },
 ];
 
 const BUG_FRAME_WIDTH = 58;
@@ -136,6 +207,7 @@ let facingLeft = false;
 let lastFrame = performance.now();
 let lastTickSecond = Date.now();
 let spawnCountdown = 2;
+let chestSpawnCountdown = 20;
 let petAttackTimer = 0;
 let knockedOutUntil = 0;
 let codingUntil = 0;
@@ -159,6 +231,8 @@ const petArmRightEl = document.getElementById('pet-arm-right');
 const shopGridEl = document.getElementById('shop-grid');
 const shopEquipGridEl = document.getElementById('shop-equip-grid');
 const statUpgradeGridEl = document.getElementById('stat-upgrade-grid');
+const achievementGridEl = document.getElementById('achievement-grid');
+const equipVisibilityToggleEl = document.getElementById('btn-toggle-equip-visibility');
 const petEquipImgs = {
   weapon: document.getElementById('pet-eq-weapon'),
   shield: document.getElementById('pet-eq-shield'),
@@ -170,6 +244,7 @@ const deathTimerEl = document.getElementById('death-timer');
 const levelupOverlayEl = document.getElementById('levelup-overlay');
 const unlockOverlayEl = document.getElementById('unlock-overlay');
 const levelupFlashEl = document.getElementById('levelup-flash');
+const gachaRollOverlayEl = document.getElementById('gacha-roll-overlay');
 
 function freshState() {
   return {
@@ -181,11 +256,17 @@ function freshState() {
     equippedAccessory: 'none',
     equipment: [],
     equipped: { weapon: null, shield: null, armor: null },
+    hideEquipmentVisuals: false,
     coins: 0,
     skins: ['default'],
     equippedSkin: 'default',
     statUpgrades: { hp: 0, atk: 0, spd: 0, luk: 0 },
     monstersCaught: 0,
+    bossesKilled: 0,
+    chestsOpened: 0,
+    purchaseCount: 0,
+    totalCoinsSpent: 0,
+    achievements: [],
     totalPlaySeconds: 0,
     lastSeen: Date.now(),
   };
@@ -255,6 +336,7 @@ function importSave() {
     renderShopGrid();
     renderShopEquipGrid();
     renderStatUpgradeGrid();
+    renderAchievementGrid();
     updateHUD();
     updatePlaytime();
     saveState();
@@ -265,6 +347,84 @@ function importSave() {
   }
 }
 
+/* ---------- 처음부터 다시하기 (진행 상황 전체 초기화) ---------- */
+
+let resetArmed = false;
+let resetArmTimer = null;
+
+function handleResetClick() {
+  const btn = document.getElementById('btn-reset-game');
+
+  if (!resetArmed) {
+    resetArmed = true;
+    btn.textContent = '정말요? 다시 클릭하면 초기화됩니다';
+    btn.classList.add('danger-armed');
+    clearTimeout(resetArmTimer);
+    resetArmTimer = setTimeout(() => {
+      resetArmed = false;
+      btn.textContent = '새로 시작하기';
+      btn.classList.remove('danger-armed');
+    }, 4000);
+
+    return;
+  }
+
+  clearTimeout(resetArmTimer);
+  resetArmed = false;
+  btn.textContent = '새로 시작하기';
+  btn.classList.remove('danger-armed');
+  resetGame();
+}
+
+function resetGame() {
+  enemies.forEach(e => e.wrap.remove());
+  enemies = [];
+  buffs = {};
+  petPos = { x: 40, y: 40 };
+  petTarget = null;
+  facingLeft = false;
+  knockedOutUntil = 0;
+  codingUntil = 0;
+  dancingUntil = 0;
+  comboCount = 0;
+  lastKillAt = 0;
+  spawnCountdown = 2;
+  chestSpawnCountdown = 20;
+  petAttackTimer = 0;
+
+  if (activeChest) {
+    clearTimeout(activeChest.timer);
+    activeChest.el.remove();
+    activeChest = null;
+  }
+
+  petBodyEl.classList.remove('ko', 'groggy', 'hurt', 'flip');
+  petAnimEl.classList.remove('dance', 'typing', 'lunge');
+  laptopEl.classList.remove('shown');
+  deathOverlayEl.classList.remove('show');
+  petSpriteEl.style.transform = `translate(${petPos.x}px, ${petPos.y}px)`;
+
+  state = freshState();
+
+  applyAccessoryVisual(currentAccessory());
+  applyEquipmentVisuals();
+  applySkinVisual(currentSkin());
+  renderAccessoryGrid();
+  renderEquipmentGrid();
+  renderShopGrid();
+  renderShopEquipGrid();
+  renderStatUpgradeGrid();
+  renderAchievementGrid();
+  updateHUD();
+  updatePlaytime();
+
+  closePopup();
+  addLog('🔄 처음부터 다시 시작합니다.');
+  showToast('새로운 여정을 시작합니다!', { icon: '🔄', variant: 'gold' });
+  saveState();
+  spawnEnemy();
+}
+
 function flashSaveIndicator() {
   const el = document.getElementById('save-indicator');
   el.textContent = '💾 저장됨';
@@ -272,8 +432,19 @@ function flashSaveIndicator() {
   setTimeout(() => { el.textContent = '💾 자동저장 대기중'; }, 1200);
 }
 
+// Lv50까지는 기존 지수 곡선 그대로(이미 익숙한 페이스 유지),
+// Lv50 이후는 선형에 가깝게 완만히 늘려 Lv100까지 부담 없이 이어지도록 한다.
+// (그대로 지수 곡선을 이어가면 Lv100 단일 레벨업에만 ~6300exp가 필요해 사실상 그라인드가 됨)
+const EXP_CURVE_BREAKPOINT = 50;
+const EXP_CURVE_TAIL_GROWTH = 0.012;
+
 function expToNext(level) {
-  return Math.floor(10 * Math.pow(level, 1.4));
+  if (level <= EXP_CURVE_BREAKPOINT) return Math.floor(10 * Math.pow(level, 1.4));
+
+  const base = 10 * Math.pow(EXP_CURVE_BREAKPOINT, 1.4);
+  const stepsPastBreakpoint = level - EXP_CURVE_BREAKPOINT;
+
+  return Math.floor(base * (1 + stepsPastBreakpoint * EXP_CURVE_TAIL_GROWTH));
 }
 
 /* ---------- 장비 시스템 ---------- */
@@ -338,14 +509,32 @@ function applyEquipmentVisuals() {
 
 function updateCombatGearVisibility() {
   // 장비는 전투 중에만 입는다 (평시·코딩·춤·KO 시 전부 해제 상태로 표시)
+  // '장비 겉모습 숨기기'가 켜져 있으면 전투 중에도 숨김 (능력치는 그대로 적용됨)
   const fighting = enemies.length > 0 && !isKnockedOut() && !isDancing() && !isCoding();
+  const visible = fighting && !state.hideEquipmentVisuals;
 
   EQUIP_SLOTS.forEach(slot => {
-    petEquipImgs[slot.id].classList.toggle('shown', !!state.equipped[slot.id] && fighting);
+    petEquipImgs[slot.id].classList.toggle('shown', !!state.equipped[slot.id] && visible);
   });
 }
 
+function toggleEquipmentVisibility() {
+  state.hideEquipmentVisuals = !state.hideEquipmentVisuals;
+  updateCombatGearVisibility();
+  updateEquipVisibilityToggleLabel();
+  addLog(state.hideEquipmentVisuals ? '🚫 장비 겉모습을 숨깁니다 (능력치는 유지)' : '👁 장비 겉모습을 다시 표시합니다');
+  saveState();
+}
+
+function updateEquipVisibilityToggleLabel() {
+  if (!equipVisibilityToggleEl) return;
+
+  equipVisibilityToggleEl.textContent = state.hideEquipmentVisuals ? '🚫 장비 겉모습 숨김' : '👁 장비 겉모습 표시';
+  equipVisibilityToggleEl.classList.toggle('active', state.hideEquipmentVisuals);
+}
+
 function renderEquipmentGrid() {
+  updateEquipVisibilityToggleLabel();
   eqGridEl.innerHTML = '';
 
   EQUIP_SLOTS.forEach(slot => {
@@ -374,7 +563,7 @@ function renderEquipmentGrid() {
 
       const name = document.createElement('div');
       name.className = 'acc-name';
-      name.textContent = eq.name;
+      name.textContent = unlocked ? eq.name : (eq.source === 'gacha' ? `??? (${eq.rarity})` : eq.name);
       card.appendChild(name);
 
       const bonusText = Object.entries(eq.bonus)
@@ -382,7 +571,7 @@ function renderEquipmentGrid() {
         .join(' · ');
       const bonusEl = document.createElement('div');
       bonusEl.className = 'eq-bonus';
-      bonusEl.textContent = bonusText;
+      bonusEl.textContent = unlocked ? bonusText : (eq.source === 'gacha' ? '상자에서만 획득' : bonusText);
       card.appendChild(bonusEl);
 
       const status = document.createElement('div');
@@ -391,7 +580,11 @@ function renderEquipmentGrid() {
         ? '장착중 (클릭해서 해제)'
         : unlocked
           ? '클릭해서 장착'
-          : (eq.price !== undefined ? `🛒 상점에서 구매 (${eq.price}🪙)` : `Lv.${eq.unlockLevel} 필요`);
+          : eq.source === 'gacha'
+            ? '상자에서 랜덤 획득'
+            : eq.price !== undefined
+              ? `상점에서 구매 (${eq.price}🪙)`
+              : `Lv.${eq.unlockLevel} 필요`;
       card.appendChild(status);
 
       if (unlocked) card.addEventListener('click', () => equipItem(eq.id));
@@ -543,15 +736,19 @@ function showUnlockCard(acc) {
   unlockOverlayEl.innerHTML = '';
 
   const isEquip = !!acc.slot;
+  const isSkin = !isEquip && !!acc.body;
+  const isGacha = acc.source === 'gacha';
 
   const card = document.createElement('div');
   card.className = 'unlock-card' + (acc.rare ? ' rare' : '');
 
   const eyebrow = document.createElement('div');
   eyebrow.className = 'unlock-eyebrow';
-  eyebrow.innerHTML = acc.rare
-    ? '<span class="star">★</span> RARE SKIN! <span class="star">★</span>'
-    : `<span class="star">★</span> ${isEquip ? 'NEW GEAR' : 'NEW SKIN'} <span class="star">★</span>`;
+  eyebrow.innerHTML = isGacha
+    ? `<span class="star">★</span> ${(acc.rarity || '').toUpperCase()} 상자 보상 <span class="star">★</span>`
+    : acc.rare
+      ? '<span class="star">★</span> RARE SKIN! <span class="star">★</span>'
+      : `<span class="star">★</span> ${isEquip ? 'NEW GEAR' : 'NEW SKIN'} <span class="star">★</span>`;
   card.appendChild(eyebrow);
 
   const preview = document.createElement('div');
@@ -565,6 +762,10 @@ function showUnlockCard(acc) {
     const item = document.createElement('img');
     item.src = acc.sprite;
     preview.appendChild(item);
+  } else if (isSkin) {
+    const base = document.createElement('img');
+    base.src = acc.body;
+    preview.appendChild(base);
   } else {
     const base = document.createElement('img');
     base.src = PET_SPRITE;
@@ -584,7 +785,9 @@ function showUnlockCard(acc) {
 
   const sub = document.createElement('div');
   sub.className = 'unlock-sub';
-  if (isEquip) {
+  if (isGacha) {
+    sub.textContent = '상자에서 획득했습니다!';
+  } else if (isEquip) {
     const bonusText = Object.entries(acc.bonus)
       .map(([k, v]) => `+${v} ${EQUIP_BONUS_LABELS[k]}`)
       .join(' · ');
@@ -653,6 +856,7 @@ function levelUp() {
 
   renderAccessoryGrid();
   renderEquipmentGrid();
+  checkAchievements();
   saveState(); // 레벨업은 즉시 저장 (15초 주기·종료 저장이 누락돼도 진행 보존)
 }
 
@@ -760,6 +964,28 @@ function gainCoins(amount, x, y) {
   updateHUD();
 }
 
+function healPercent(ratio) {
+  const healed = Math.round(maxHp() * ratio);
+  state.curHp = Math.min(maxHp(), state.curHp + healed);
+  floatText(`+${healed} HP`, petPos.x + 10, petPos.y - 20, '#7fd88f');
+  updateHUD();
+}
+
+// 대청소 이벤트 전용: 근처 몬스터 전부 제거 (사망 시 산개와 달리 전멸)
+function clearAllEnemies() {
+  if (!enemies.length) return;
+
+  enemies.forEach(e => {
+    spawnParticles(e.x + e.w / 2, e.y + e.h / 2, ['#8b6bff', '#a78bfa', '#57d7f2'], 8);
+    e.wrap.classList.add('vanish');
+    setTimeout(() => e.wrap.remove(), 260);
+  });
+
+  const cleared = enemies.length;
+  enemies = [];
+  addLog(`🧹 대청소! 몬스터 ${cleared}마리가 사라졌다`);
+}
+
 function currentSkin() {
   return PET_SKINS.find(s => s.id === state.equippedSkin) || PET_SKINS[0];
 }
@@ -781,12 +1007,15 @@ function buySkin(id) {
   }
 
   state.coins -= skin.price;
+  state.purchaseCount += 1;
+  state.totalCoinsSpent += skin.price;
   state.skins.push(id);
   state.equippedSkin = id;
   addLog(`🛒 스킨 구매: ${skin.name} (-${skin.price}🪙)`);
   showToast(`${skin.name} 구매 완료!`, { icon: skin.icon, variant: 'gold' });
   applySkinVisual(skin);
   renderShopGrid();
+  checkAchievements();
   updateHUD();
   saveState();
 }
@@ -805,9 +1034,10 @@ function renderShopGrid() {
   shopGridEl.innerHTML = '';
 
   PET_SKINS.forEach(skin => {
+    const isGacha = skin.source === 'gacha';
     const owned = state.skins.includes(skin.id);
     const equipped = state.equippedSkin === skin.id;
-    const afford = state.coins >= skin.price;
+    const afford = !isGacha && state.coins >= skin.price;
 
     const card = document.createElement('div');
     card.className = 'acc-card' + (equipped ? ' equipped' : '') + (!owned && !afford ? ' locked' : '');
@@ -816,17 +1046,24 @@ function renderShopGrid() {
     preview.className = 'acc-preview';
     const img = document.createElement('img');
     img.src = skin.body;
+    img.style.filter = (owned || !isGacha) ? '' : 'grayscale(1) brightness(.35)';
     preview.appendChild(img);
     card.appendChild(preview);
 
     const name = document.createElement('div');
     name.className = 'acc-name';
-    name.textContent = `${skin.icon} ${skin.name}`;
+    name.textContent = (owned || !isGacha) ? `${skin.icon} ${skin.name}` : `??? (${skin.rarity})`;
     card.appendChild(name);
 
     const status = document.createElement('div');
     status.className = 'acc-status';
-    status.textContent = equipped ? '장착중' : (owned ? '클릭해서 장착' : `${skin.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`);
+    status.textContent = equipped
+      ? '장착중'
+      : owned
+        ? '클릭해서 장착'
+        : isGacha
+          ? '상자에서 랜덤 획득'
+          : `${skin.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`;
     card.appendChild(status);
 
     if (owned) card.addEventListener('click', () => equipSkin(skin.id));
@@ -847,11 +1084,14 @@ function buyEquipment(id) {
   }
 
   state.coins -= item.price;
+  state.purchaseCount += 1;
+  state.totalCoinsSpent += item.price;
   state.equipment.push(id);
   addLog(`🛒 장비 구매: ${item.name} (-${item.price}🪙)`);
   showToast(`${item.name} 구매 완료!`, { icon: '⚔', variant: 'gold', sub: '⚔ 장비 메뉴에서 장착하세요' });
   renderShopEquipGrid();
   renderEquipmentGrid();
+  checkAchievements();
   updateHUD();
   saveState();
 }
@@ -913,6 +1153,8 @@ function buyStatUpgrade(id) {
   }
 
   state.coins -= price;
+  state.purchaseCount += 1;
+  state.totalCoinsSpent += price;
   state.statUpgrades[id] = count + 1;
   state.stats[id] = Math.round((state.stats[id] + def.step) * 10) / 10;
   if (id === 'hp') state.curHp = maxHp();
@@ -921,6 +1163,7 @@ function buyStatUpgrade(id) {
   addLog(`💪 능력치 강화: ${def.label} +${def.step} (-${price}🪙)`);
   showToast(`${def.label} 강화 완료!`, { icon: def.icon, variant: 'gold' });
   renderStatUpgradeGrid();
+  checkAchievements();
   updateHUD();
   saveState();
 }
@@ -950,6 +1193,50 @@ function renderStatUpgradeGrid() {
     row.appendChild(btn);
 
     statUpgradeGridEl.appendChild(row);
+  });
+}
+
+/* ---------- 업적 ---------- */
+
+function checkAchievements() {
+  const newly = ACHIEVEMENTS.filter(a => !state.achievements.includes(a.id) && a.check(state));
+  if (!newly.length) return;
+
+  newly.forEach(a => {
+    state.achievements.push(a.id);
+    addLog(`🏆 업적 달성: ${a.name}`);
+    showToast(`업적 달성: ${a.name}`, { icon: a.icon, variant: 'gold', sub: a.desc });
+  });
+
+  renderAchievementGrid();
+}
+
+function renderAchievementGrid() {
+  if (!achievementGridEl) return;
+  achievementGridEl.innerHTML = '';
+
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = state.achievements.includes(a.id);
+
+    const card = document.createElement('div');
+    card.className = 'acc-card no-click' + (unlocked ? ' equipped' : ' locked');
+
+    const preview = document.createElement('div');
+    preview.className = 'acc-preview achievement-preview';
+    preview.textContent = a.icon;
+    card.appendChild(preview);
+
+    const name = document.createElement('div');
+    name.className = 'acc-name';
+    name.textContent = a.name;
+    card.appendChild(name);
+
+    const status = document.createElement('div');
+    status.className = 'acc-status';
+    status.textContent = unlocked ? a.desc : `${a.desc} (미달성)`;
+    card.appendChild(status);
+
+    achievementGridEl.appendChild(card);
   });
 }
 
@@ -1032,6 +1319,100 @@ function spawnEnemy(opts = {}) {
   if (opts.boss) shakeStage();
 }
 
+/* ---------- 상자(가챠): 맵에 랜덤 스폰 → 클릭 개봉 → 롤링 연출 → 랜덤 장비/스킨 지급 ---------- */
+
+const CHEST_MIN_INTERVAL_S = 40;
+const CHEST_MAX_INTERVAL_S = 75;
+const CHEST_DESPAWN_MS = 20000;
+const GACHA_ROLL_DURATION_MS = 1400;
+
+let activeChest = null;
+
+function spawnChest() {
+  if (activeChest) return;
+
+  const bounds = stageEl.getBoundingClientRect();
+  const w = 32, h = 26;
+  const x = Math.random() * Math.max(20, bounds.width - w);
+  const y = Math.random() * Math.max(20, bounds.height - h);
+
+  const el = document.createElement('div');
+  el.className = 'chest';
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.addEventListener('click', openChest);
+  stageEl.appendChild(el);
+
+  const timer = setTimeout(() => {
+    if (activeChest && activeChest.el === el) {
+      el.remove();
+      activeChest = null;
+    }
+  }, CHEST_DESPAWN_MS);
+
+  activeChest = { el, timer };
+}
+
+function openChest() {
+  if (!activeChest) return;
+
+  clearTimeout(activeChest.timer);
+  activeChest.el.remove();
+  activeChest = null;
+
+  showGachaRoll();
+}
+
+function showGachaRoll() {
+  if (!gachaRollOverlayEl) { grantGachaReward(rollGacha()); return; }
+
+  gachaRollOverlayEl.classList.add('show');
+  gachaRollOverlayEl.setAttribute('aria-hidden', 'false');
+
+  setTimeout(() => {
+    gachaRollOverlayEl.classList.remove('show');
+    gachaRollOverlayEl.setAttribute('aria-hidden', 'true');
+    grantGachaReward(rollGacha());
+  }, GACHA_ROLL_DURATION_MS);
+}
+
+function rollGacha() {
+  const pool = [
+    ...GACHA_EQUIPMENT.map(item => ({ kind: 'equip', item })),
+    ...GACHA_SKINS.map(item => ({ kind: 'skin', item })),
+  ];
+  const weighted = pool.flatMap(entry => Array(GACHA_RARITY_WEIGHTS[entry.item.rarity] || 10).fill(entry));
+
+  return weighted[Math.floor(Math.random() * weighted.length)];
+}
+
+function grantGachaReward({ kind, item }) {
+  state.chestsOpened += 1;
+
+  const owned = kind === 'equip' ? state.equipment.includes(item.id) : state.skins.includes(item.id);
+
+  if (owned) {
+    const refund = GACHA_DUPLICATE_REFUND[item.rarity] || 15;
+    gainCoins(refund);
+    addLog(`🎁 상자 개봉: ${item.name} (이미 보유 중 → +${refund}🪙 전환)`);
+    showToast(`중복! ${item.name} → +${refund}🪙`, { icon: '🎁' });
+  } else {
+    if (kind === 'equip') state.equipment.push(item.id);
+    else state.skins.push(item.id);
+
+    addLog(`🎁 상자에서 ${item.name} 획득! (${item.rarity})`);
+    queueUnlockPopup({ ...item, rare: item.rarity !== 'common' });
+
+    if (kind === 'equip') renderEquipmentGrid();
+    else renderShopGrid();
+    renderShopEquipGrid();
+  }
+
+  checkAchievements();
+  updateHUD();
+  saveState();
+}
+
 function damageEnemy(target, amount, crit = false) {
   target.hp -= amount;
   target.hpfill.style.width = `${Math.max(0, (target.hp / target.maxHp) * 100)}%`;
@@ -1069,6 +1450,7 @@ function killEnemy(target) {
   target.wrap.remove();
   enemies = enemies.filter(e => e !== target);
   state.monstersCaught += 1;
+  if (target.isBoss) state.bossesKilled += 1;
 
   // 4초 안에 연속 처치하면 콤보 (보너스 EXP)
   const now = Date.now();
@@ -1086,6 +1468,7 @@ function killEnemy(target) {
   else if (target.isGolden) addLog(`💰 황금 ${target.type.name} 처치! EXP 대박 (+${exp} EXP · +${coinGain}🪙)`);
   else addLog(`⚔ ${target.type.name} 처치! (총 ${state.monstersCaught}마리)`);
 
+  checkAchievements();
   updateHUD();
 }
 
@@ -1368,6 +1751,8 @@ function updateHUD() {
   document.getElementById('sd-caught').textContent = state.monstersCaught;
   document.getElementById('sd-acc').textContent = `${state.accessories.length} / ${ACCESSORIES.length}`;
   document.getElementById('sd-eq').textContent = `${state.equipment.length} / ${EQUIPMENT.length}`;
+  document.getElementById('sd-chests').textContent = state.chestsOpened;
+  document.getElementById('sd-achievements').textContent = `${state.achievements.length} / ${ACHIEVEMENTS.length}`;
   document.getElementById('sd-coins').textContent = state.coins;
   document.getElementById('coin-display').textContent = `🪙 ${state.coins}`;
   document.getElementById('shop-coin-balance').textContent = state.coins;
@@ -1455,6 +1840,42 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && activePopup) closePopup();
 });
 
+/* ---------- 상점 내부 탭 (스탯 강화 / 스킨 / 장비) ---------- */
+
+function openShopTab(name) {
+  document.querySelectorAll('.shop-tab').forEach(btn => btn.classList.toggle('active', btn.dataset.shopTab === name));
+  document.querySelectorAll('.shop-tab-panel').forEach(el => el.classList.toggle('hidden', el.id !== `shop-panel-${name}`));
+}
+
+document.querySelectorAll('.shop-tab').forEach(btn => {
+  btn.addEventListener('click', () => openShopTab(btn.dataset.shopTab));
+});
+
+/* ---------- 배포 버전 확인 (오래 열어둔 탭에 새 버전 알림) ---------- */
+
+const versionBannerEl = document.getElementById('version-banner');
+
+async function checkVersion() {
+  try {
+    const res = await fetch(`version.json?t=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) return;
+
+    const data = await res.json();
+    if (data.version && data.version !== GAME_VERSION) showVersionMismatch();
+  } catch {
+    // 오프라인 등 네트워크 오류는 무시
+  }
+}
+
+function showVersionMismatch() {
+  if (!versionBannerEl || versionBannerEl.classList.contains('show')) return;
+
+  versionBannerEl.classList.add('show');
+  versionBannerEl.setAttribute('aria-hidden', 'false');
+}
+
+document.getElementById('btn-version-reload').addEventListener('click', () => location.reload());
+
 function scheduleNextEvent() {
   const delay = 10000 + Math.random() * 15000;
   setTimeout(() => {
@@ -1489,6 +1910,12 @@ function loop(now) {
     spawnEnemy();
   }
 
+  chestSpawnCountdown -= dt;
+  if (chestSpawnCountdown <= 0 && !activeChest) {
+    chestSpawnCountdown = CHEST_MIN_INTERVAL_S + Math.random() * (CHEST_MAX_INTERVAL_S - CHEST_MIN_INTERVAL_S);
+    spawnChest();
+  }
+
   updateMovement(dt);
   updateCombat(dt);
   updateCombatGearVisibility();
@@ -1520,6 +1947,7 @@ function init() {
   renderShopGrid();
   renderShopEquipGrid();
   renderStatUpgradeGrid();
+  renderAchievementGrid();
   updateHUD();
   updatePlaytime();
   scheduleNextEvent();
@@ -1532,10 +1960,15 @@ function init() {
   window.addEventListener('pagehide', saveState);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') saveState();
+    else checkVersion(); // 오래 열어둔 탭으로 돌아왔을 때 새 배포가 있었는지 확인
   });
+
+  setInterval(checkVersion, VERSION_CHECK_INTERVAL_MS);
 
   document.getElementById('btn-export-save').addEventListener('click', exportSave);
   document.getElementById('btn-import-save').addEventListener('click', importSave);
+  document.getElementById('btn-reset-game').addEventListener('click', handleResetClick);
+  equipVisibilityToggleEl.addEventListener('click', toggleEquipmentVisibility);
 
   if (!storage) {
     document.getElementById('save-indicator').textContent = '⚠ 자동저장 불가 (브라우저 설정)';

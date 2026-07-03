@@ -23,7 +23,9 @@
         <button class="menu-btn" data-popup="skins">📦 스킨</button>
         <button class="menu-btn" data-popup="shop">🛒 상점</button>
         <button class="menu-btn" data-popup="equip">⚔ 장비</button>
+        <button class="menu-btn" data-popup="achievements">🏆 업적</button>
         <button class="menu-btn" data-popup="stats">📈 스탯</button>
+        <button class="menu-btn" data-popup="save">💾 세이브</button>
         <button class="menu-btn" data-popup="terminal">🖥 로그</button>
       </div>
     </div>
@@ -88,14 +90,22 @@
           <span class="popup-title">🛒 shop.json — 상점 (<span id="shop-coin-balance"></span>🪙)</span>
           <button class="popup-close" aria-label="닫기">✕</button>
         </div>
+        <div class="shop-tabs">
+          <button class="shop-tab active" data-shop-tab="stat">스탯</button>
+          <button class="shop-tab" data-shop-tab="skin">스킨</button>
+          <button class="shop-tab" data-shop-tab="equip">장비</button>
+        </div>
         <div class="popup-body">
-          <p class="panel-desc">몬스터를 처치하면 커밋 코인을 얻습니다. 코인으로 능력치를 강화하거나 특별한 스킨을 구매하세요.</p>
-          <div class="shop-section-title">💪 능력치 강화</div>
-          <div class="stat-upgrade-grid" id="stat-upgrade-grid"></div>
-          <div class="shop-section-title">👔 프리미엄 스킨</div>
-          <div class="acc-grid" id="shop-grid"></div>
-          <div class="shop-section-title">⚔ 프리미엄 장비</div>
-          <div class="acc-grid eq-grid" id="shop-equip-grid"></div>
+          <p class="panel-desc">몬스터를 처치하면 커밋 코인을 얻습니다. 코인으로 능력치를 강화하거나 특별한 스킨·장비를 구매하세요.</p>
+          <div class="shop-tab-panel" id="shop-panel-stat">
+            <div class="stat-upgrade-grid" id="stat-upgrade-grid"></div>
+          </div>
+          <div class="shop-tab-panel hidden" id="shop-panel-skin">
+            <div class="acc-grid" id="shop-grid"></div>
+          </div>
+          <div class="shop-tab-panel hidden" id="shop-panel-equip">
+            <div class="acc-grid eq-grid" id="shop-equip-grid"></div>
+          </div>
         </div>
       </section>
 
@@ -106,7 +116,22 @@
         </div>
         <div class="popup-body">
           <p class="panel-desc">레벨업하면 새 장비가 해금됩니다. 장착하면 능력치가 올라가고, 장착 중인 장비를 클릭하면 해제됩니다.</p>
+          <div class="eq-toolbar">
+            <button class="menu-btn" id="btn-toggle-equip-visibility">👁 장비 겉모습 표시</button>
+            <span class="eq-toolbar-hint">전투 중 장비 겉모습만 껐다 켤 수 있어요 (능력치는 계속 적용)</span>
+          </div>
           <div class="eq-slots" id="eq-grid"></div>
+        </div>
+      </section>
+
+      <section class="popup-window hidden" id="popup-achievements">
+        <div class="popup-header">
+          <span class="popup-title">🏆 achievements.log — 업적</span>
+          <button class="popup-close" aria-label="닫기">✕</button>
+        </div>
+        <div class="popup-body">
+          <p class="panel-desc">플레이하며 자동으로 달성됩니다. 처치·구매·상자 개봉·레벨 마일스톤을 확인하세요.</p>
+          <div class="acc-grid" id="achievement-grid"></div>
         </div>
       </section>
 
@@ -127,16 +152,33 @@
             <div class="stat-line"><span>🎯 잡은 몬스터</span><b id="sd-caught"></b></div>
             <div class="stat-line"><span>👕 해금 액세서리</span><b id="sd-acc"></b></div>
             <div class="stat-line"><span>⚔ 해금 장비</span><b id="sd-eq"></b></div>
+            <div class="stat-line"><span>🎁 상자 개봉</span><b id="sd-chests"></b></div>
+            <div class="stat-line"><span>🏆 업적</span><b id="sd-achievements"></b></div>
             <div class="stat-line"><span>🪙 커밋 코인</span><b id="sd-coins"></b></div>
             <div class="stat-line"><span>⏱ 플레이 시간</span><b id="sd-playtime"></b></div>
           </div>
+        </div>
+      </section>
+
+      <section class="popup-window hidden" id="popup-save">
+        <div class="popup-header">
+          <span class="popup-title">save.manager — 세이브</span>
+          <button class="popup-close" aria-label="닫기">✕</button>
+        </div>
+        <div class="popup-body">
           <div class="save-tools">
-            <div class="save-tools-title">💾 세이브 백업</div>
-            <textarea id="save-code" rows="3" spellcheck="false" placeholder="내보내기를 누르면 세이브 코드가 생성·복사됩니다. 불러오려면 코드를 붙여넣고 불러오기를 누르세요."></textarea>
+            <div class="save-tools-title">세이브 백업</div>
+            <p class="save-tools-desc">내보내기를 누르면 세이브 코드가 생성·복사됩니다. 불러오려면 코드를 붙여넣고 불러오기를 누르세요.</p>
+            <textarea id="save-code" rows="3" spellcheck="false" placeholder="여기에 세이브 코드가 표시되거나, 불러올 코드를 붙여넣으세요."></textarea>
             <div class="save-tools-btns">
-              <button class="menu-btn" id="btn-export-save">📤 내보내기</button>
-              <button class="menu-btn" id="btn-import-save">📥 불러오기</button>
+              <button class="menu-btn" id="btn-export-save">내보내기</button>
+              <button class="menu-btn" id="btn-import-save">불러오기</button>
             </div>
+          </div>
+          <div class="save-tools reset-tools">
+            <div class="save-tools-title">처음부터 다시하기</div>
+            <p class="save-tools-desc">레벨·장비·스킨·코인 등 모든 진행 상황이 초기화됩니다. 되돌릴 수 없습니다.</p>
+            <button class="menu-btn danger-btn" id="btn-reset-game">새로 시작하기</button>
           </div>
         </div>
       </section>
@@ -167,9 +209,21 @@
       </div>
     </div>
 
+    <div class="gacha-roll-overlay" id="gacha-roll-overlay" aria-hidden="true">
+      <div class="gacha-roll-card">
+        <img class="gacha-roll-icon" src="assets/sprites/chest.png" alt="">
+        <div class="gacha-roll-text">상자를 여는 중...</div>
+      </div>
+    </div>
+
     <div class="toast-stack" id="toast-stack"></div>
     <div class="levelup-flash" id="levelup-flash"></div>
     <div class="unlock-overlay" id="unlock-overlay" aria-hidden="true"></div>
+
+    <div class="version-banner" id="version-banner" aria-hidden="true">
+      <span>버전이 다릅니다. 새로고침(F5)을 눌러 업데이트 하세요!</span>
+      <button class="menu-btn" id="btn-version-reload">새로고침</button>
+    </div>
   </div>
 
 <script src="game.js"></script>

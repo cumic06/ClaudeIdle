@@ -431,12 +431,6 @@ html, body {
 .acc-card.equipped .acc-status { color: #d97757; }
 
 /* Shop popup (재화 · 능력치 강화 · 프리미엄 스킨) */
-.shop-section-title {
-  font-family: "Press Start 2P", monospace;
-  font-size: 10px;
-  color: #d97757;
-  padding: 12px 20px 0;
-}
 .stat-upgrade-grid {
   padding: 10px 20px 4px;
   display: flex;
@@ -871,3 +865,133 @@ html, body {
   background: linear-gradient(180deg, rgba(255, 255, 255, .38), rgba(255, 255, 255, 0));
   border-radius: 5px 5px 0 0;
 }
+
+/* --- 상점 내부 탭 (스탯 / 스킨 / 장비) --- */
+.shop-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 10px 20px 0;
+  border-bottom: 1px solid #2a2a2a;
+}
+.shop-tab {
+  font-family: inherit;
+  font-size: 12px;
+  background: none;
+  color: #8b8b8b;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 6px;
+  cursor: pointer;
+}
+.shop-tab:hover { color: #d4d4d4; }
+.shop-tab.active { color: #d97757; border-bottom-color: #d97757; }
+.shop-tab-panel.hidden { display: none; }
+
+/* --- 세이브 / 초기화 팝업 --- */
+.save-tools-desc { color: #9a9a9a; font-size: 12px; margin: 0 0 8px; }
+.reset-tools { border-top: 1px solid #2a2a2a; margin-top: 4px; padding-top: 16px; }
+.danger-btn { border-color: #7a3030; color: #ff9a9a; }
+.danger-btn:hover { background: #3a1f1f; border-color: #e5484d; color: #ffffff; }
+.danger-btn.danger-armed {
+  background: #4a1414;
+  border-color: #e5484d;
+  color: #ffb3b3;
+  animation: danger-pulse 1s ease-in-out infinite;
+}
+@keyframes danger-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
+
+/* --- 버전 불일치 알림 배너 --- */
+.version-banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 101;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 16px;
+  background: #7a2323;
+  color: #fdeaea;
+  font-size: 12px;
+  transform: translateY(-100%);
+  transition: transform .3s ease;
+}
+.version-banner.show { transform: translateY(0); }
+.version-banner .menu-btn { background: #fdeaea; color: #7a2323; border-color: #fdeaea; }
+.version-banner .menu-btn:hover { background: #ffffff; }
+
+/* --- 상자 (맵 스폰, 클릭 개봉) --- */
+.chest {
+  position: absolute;
+  width: 32px;
+  height: 26px;
+  background-image: url("assets/sprites/chest.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  cursor: pointer;
+  filter: drop-shadow(0 0 6px rgba(255, 213, 74, .65));
+  animation: chest-bob 1.6s ease-in-out infinite;
+  z-index: 3;
+}
+@keyframes chest-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* --- 가챠 롤링 연출 (상자 개봉 → 보상 카드로 이어짐) --- */
+.gacha-roll-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 6, 5, 0);
+  opacity: 0;
+  pointer-events: none;
+  transition: background .2s ease, opacity .2s ease;
+}
+.gacha-roll-overlay.show {
+  background: rgba(8, 6, 5, .6);
+  opacity: 1;
+  pointer-events: auto;
+}
+.gacha-roll-card { text-align: center; }
+.gacha-roll-icon {
+  width: 64px;
+  height: 52px;
+  image-rendering: pixelated;
+  animation: gacha-shake .35s ease-in-out infinite;
+}
+.gacha-roll-text {
+  margin-top: 12px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 11px;
+  color: #ffd54a;
+}
+@keyframes gacha-shake {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+
+/* --- 업적 팝업 --- */
+.acc-card.no-click { cursor: default; }
+.achievement-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  height: 50px;
+}
+
+/* --- 장비 팝업 툴바 (겉모습 표시/숨김 토글) --- */
+.eq-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 10px;
+  flex-wrap: wrap;
+}
+.eq-toolbar-hint { font-size: 11px; color: #6b6b6b; }
+.menu-btn.active { background: #3a2f1a; border-color: #ffd54a; color: #ffd54a; }

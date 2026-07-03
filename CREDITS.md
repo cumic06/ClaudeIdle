@@ -8,6 +8,10 @@ All assets are free/open license, safe for personal and commercial use.
   [opengameart.org/content/tiny-creatures](https://opengameart.org/content/tiny-creatures)
   License: CC0 1.0 Universal (see `tiny-creatures-LICENSE.txt`, attribution not required)
 
+- **`assets/sprites/enemy-6.png` ~ `enemy-11.png`** — enemy monsters (젤리·외눈이·꽃게·유령·거미·공벌레), from **Tiny Dungeon** by Kenney
+  [kenney.nl/assets/tiny-dungeon](https://kenney.nl/assets/tiny-dungeon)
+  License: CC0 1.0 Universal (see `tiny-dungeon-LICENSE.txt`, attribution not required)
+
 - **`assets/sprites/bug.png`** — enemy bug, **Pixel Bug** by Umplix
   [opengameart.org/content/pixel-bug](https://opengameart.org/content/pixel-bug)
   License: CC0 (Public Domain)
