@@ -299,6 +299,13 @@ html, body {
   transition: width .15s ease;
 }
 
+/* 사망 시 주변 몬스터 산개 — wrap엔 다른 애니메이션이 없어 sprite의 enemy-bob과 충돌하지 않는다 */
+.enemy-wrap.vanish { animation: enemy-vanish .26s ease forwards; }
+@keyframes enemy-vanish {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(.3); }
+}
+
 .float-text {
   position: absolute;
   font-size: 12px;
@@ -674,7 +681,7 @@ html, body {
   100% { opacity: 0; transform: translateX(40px); height: 0; margin: 0; padding-top: 0; padding-bottom: 0; }
 }
 
-/* --- 레벨업 화면 플래시 + 배너 --- */
+/* --- 레벨업 화면 플래시 + 중앙 팝업 카드 --- */
 .levelup-flash {
   position: fixed;
   inset: 0;
@@ -687,26 +694,47 @@ html, body {
 @keyframes flash-pulse {
   0% { opacity: 0; } 28% { opacity: 1; } 100% { opacity: 0; }
 }
-.levelup-banner {
+.levelup-overlay {
   position: fixed;
-  top: 36%;
-  left: 50%;
+  inset: 0;
   z-index: 85;
-  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* 시각 전용 — 자주 뜨므로 게임 조작을 막지 않고 자동으로 사라짐 */
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.levelup-overlay.show { opacity: 1; }
+.levelup-card {
+  text-align: center;
+  padding: 24px 44px 22px;
+  background: linear-gradient(165deg, #2b2113, #17130a);
+  border: 3px solid #ffd54a;
+  border-radius: 14px;
+  box-shadow: 0 0 0 2px #17130a, 0 0 34px rgba(255, 213, 74, .5), 0 16px 46px rgba(0, 0, 0, .65);
+  animation: levelup-pop .4s cubic-bezier(.2, 1.5, .35, 1) both;
+}
+.levelup-title {
   font-family: "Press Start 2P", monospace;
   font-size: 20px;
   color: #ffd54a;
   text-shadow: 0 0 14px rgba(255, 213, 74, .8), 0 3px 0 #7a4a10;
-  animation: banner-up 1.7s ease forwards;
-  white-space: nowrap;
 }
-.levelup-banner small { display: block; text-align: center; font-size: 9px; color: #f0a878; margin-top: 8px; text-shadow: none; }
-@keyframes banner-up {
-  0% { opacity: 0; transform: translate(-50%, 14px) scale(.8); }
-  18% { opacity: 1; transform: translate(-50%, 0) scale(1.05); }
-  30% { transform: translate(-50%, 0) scale(1); }
-  80% { opacity: 1; }
-  100% { opacity: 0; transform: translate(-50%, -24px) scale(1); }
+.levelup-level {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #f0a878;
+}
+.levelup-gains {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #6ee7a0;
+}
+@keyframes levelup-pop {
+  0% { opacity: 0; transform: scale(.6) translateY(10px); }
+  65% { transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 /* --- 스킨 언락 팝업 (중앙 모달) --- */

@@ -81,6 +81,7 @@ const ENEMY_MOVE_SPEED = 24;
 const KO_DURATION_MS = 4000;
 const GROGGY_DURATION_MS = 8000;
 const DEATH_EXP_LOSS_RATE = 0.3;
+const DEATH_SCATTER_RADIUS = 240;
 
 const CODING_MIN_MS = 4000;
 const CODING_MAX_MS = 8000;
@@ -122,6 +123,7 @@ const petEquipImgs = {
 const toastStackEl = document.getElementById('toast-stack');
 const deathOverlayEl = document.getElementById('death-overlay');
 const deathTimerEl = document.getElementById('death-timer');
+const levelupOverlayEl = document.getElementById('levelup-overlay');
 const unlockOverlayEl = document.getElementById('unlock-overlay');
 const levelupFlashEl = document.getElementById('levelup-flash');
 
@@ -443,17 +445,27 @@ function showToast(text, opts = {}) {
   }, opts.duration || 3000);
 }
 
-function showLevelUpBanner(level) {
+let levelupPopupTimer = null;
+
+function showLevelUpPopup(level) {
   if (levelupFlashEl) {
     levelupFlashEl.classList.remove('show');
     void levelupFlashEl.offsetWidth; // reflow → 애니메이션 재시작
     levelupFlashEl.classList.add('show');
   }
-  const banner = document.createElement('div');
-  banner.className = 'levelup-banner';
-  banner.innerHTML = `LEVEL UP!<small>Lv.${level} 달성</small>`;
-  document.querySelector('.ide-window').appendChild(banner);
-  setTimeout(() => banner.remove(), 1750);
+
+  const gains = ['+5 HP', '+1 ATK', '+0.4 SPD'];
+  if (level % 3 === 0) gains.push('+1 LUK');
+
+  document.getElementById('levelup-level').textContent = `Lv.${level} 달성`;
+  document.getElementById('levelup-gains').textContent = gains.join(' · ');
+
+  levelupOverlayEl.classList.remove('show');
+  void levelupOverlayEl.offsetWidth; // reflow → 애니메이션 재시작
+  levelupOverlayEl.classList.add('show');
+
+  clearTimeout(levelupPopupTimer);
+  levelupPopupTimer = setTimeout(() => levelupOverlayEl.classList.remove('show'), 1900);
 }
 
 let unlockQueue = [];
@@ -568,7 +580,7 @@ function levelUp() {
   if (state.level % 3 === 0) state.stats.luk += 1;
 
   addLog(`⭐ 레벨업! Lv.${state.level} 달성`);
-  showLevelUpBanner(state.level);
+  showLevelUpPopup(state.level);
 
   checkAccessoryUnlocks();
   checkEquipmentUnlocks();
@@ -827,6 +839,7 @@ function damagePet(amount, from) {
     state.curHp = 0;
     knockedOutUntil = Date.now() + KO_DURATION_MS;
     petBodyEl.classList.add('ko');
+    scatterEnemiesOnDeath();
     addLog(`💀 ${from.type.name}에게 당했다... ${KO_DURATION_MS / 1000}초 후 부활`);
 
     setTimeout(() => {
@@ -842,6 +855,27 @@ function damagePet(amount, from) {
 
 function isKnockedOut() {
   return Date.now() < knockedOutUntil;
+}
+
+// 쓰러지는 순간 주변 몬스터 일부가 흩어져 부활 직후 즉사 재차징을 완화한다
+function scatterEnemiesOnDeath() {
+  const cx = petPos.x + 48;
+  const cy = petPos.y + 30;
+  const nearby = enemies.filter(e => Math.hypot(e.x + e.w / 2 - cx, e.y + e.h / 2 - cy) <= DEATH_SCATTER_RADIUS);
+
+  if (!nearby.length) return;
+
+  const removeCount = Math.max(1, Math.ceil(nearby.length / 2));
+  const toRemove = [...nearby].sort(() => Math.random() - 0.5).slice(0, removeCount);
+
+  toRemove.forEach(e => {
+    spawnParticles(e.x + e.w / 2, e.y + e.h / 2, ['#8b6bff', '#a78bfa', '#57d7f2'], 8);
+    e.wrap.classList.add('vanish'); // wrap엔 애니메이션이 없어 sprite의 enemy-bob과 충돌하지 않는다
+    setTimeout(() => e.wrap.remove(), 260);
+  });
+
+  enemies = enemies.filter(e => !toRemove.includes(e));
+  addLog(`💨 쓰러지자 주변 몬스터 ${toRemove.length}마리가 흩어졌다`);
 }
 
 function updateDeathOverlay() {
