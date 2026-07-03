@@ -224,6 +224,51 @@ function buyStatUpgrade(id) {
   saveState();
 }
 
+/* ---------- 능력치 강화 버튼 꾹 누르기 (연속 구매) ---------- */
+
+const STAT_UPGRADE_HOLD_DELAY = 350; // 누른 후 연속 구매가 시작되기까지의 지연(ms)
+const STAT_UPGRADE_HOLD_INTERVAL = 90; // 연속 구매 간격(ms)
+
+let statUpgradeHoldId = null;
+let statUpgradeHoldTimeout = null;
+let statUpgradeHoldInterval = null;
+
+function startStatUpgradeHold(id) {
+  stopStatUpgradeHold();
+  statUpgradeHoldId = id;
+  buyStatUpgrade(id);
+  statUpgradeHoldTimeout = setTimeout(() => {
+    statUpgradeHoldInterval = setInterval(repeatStatUpgradeHold, STAT_UPGRADE_HOLD_INTERVAL);
+  }, STAT_UPGRADE_HOLD_DELAY);
+}
+
+function repeatStatUpgradeHold() {
+  const id = statUpgradeHoldId;
+  if (!id) return stopStatUpgradeHold();
+
+  const def = STAT_UPGRADES.find(s => s.id === id);
+  const count = state.statUpgrades[id] || 0;
+  const price = Math.round(def.basePrice * Math.pow(def.priceGrowth, count));
+
+  if (state.coins < price) return stopStatUpgradeHold();
+
+  buyStatUpgrade(id);
+}
+
+function stopStatUpgradeHold() {
+  clearTimeout(statUpgradeHoldTimeout);
+  clearInterval(statUpgradeHoldInterval);
+  statUpgradeHoldTimeout = null;
+  statUpgradeHoldInterval = null;
+  statUpgradeHoldId = null;
+}
+
+// 버튼이 매 구매마다 다시 그려지므로, 떼는 동작은 특정 버튼이 아니라
+// document/window에 걸어 재렌더링과 무관하게 항상 감지되게 한다.
+document.addEventListener('pointerup', stopStatUpgradeHold);
+document.addEventListener('pointercancel', stopStatUpgradeHold);
+window.addEventListener('blur', stopStatUpgradeHold);
+
 function renderStatUpgradeGrid() {
   statUpgradeGridEl.innerHTML = '';
 
@@ -245,7 +290,13 @@ function renderStatUpgradeGrid() {
     btn.className = 'menu-btn stat-upgrade-btn' + (afford ? '' : ' disabled');
     btn.textContent = `+${def.step} (${price}🪙)`;
     btn.disabled = !afford;
-    if (afford) btn.addEventListener('click', () => buyStatUpgrade(def.id));
+    if (afford)
+      btn.addEventListener('pointerdown', e => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+        e.preventDefault();
+        startStatUpgradeHold(def.id);
+      });
     row.appendChild(btn);
 
     statUpgradeGridEl.appendChild(row);

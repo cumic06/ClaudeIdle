@@ -455,7 +455,7 @@ html, body {
   font-size: 13px;
 }
 .stat-upgrade-label { color: #d4d4d4; }
-.stat-upgrade-btn { font-size: 11px; white-space: nowrap; }
+.stat-upgrade-btn { font-size: 11px; white-space: nowrap; touch-action: none; }
 .stat-upgrade-btn.disabled,
 .stat-upgrade-btn:disabled {
   opacity: .45;
