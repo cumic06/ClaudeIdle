@@ -93,35 +93,6 @@ html, body {
   min-height: 0;
 }
 
-.sidebar {
-  width: 200px;
-  background: #252526;
-  padding: 10px 8px;
-  font-size: 12px;
-  overflow-y: auto;
-  user-select: none;
-}
-.sidebar h3 {
-  font-size: 11px;
-  color: #8b8b8b;
-  letter-spacing: 1px;
-  margin: 0 0 8px 4px;
-}
-.explorer-section {
-  color: #cccccc;
-  font-weight: bold;
-  margin: 4px 0 6px 4px;
-}
-.tree { display: flex; flex-direction: column; gap: 2px; }
-.tree-item {
-  padding: 5px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  color: #cccccc;
-}
-.tree-item:hover { background: #2a2d2e; }
-.tree-item.active { background: #37373d; color: #d97757; }
-
 /* Content / panels */
 .content {
   flex: 1;
@@ -217,9 +188,10 @@ html, body {
   width: 28px; height: auto;
   left: -10px; right: auto; top: 20px; bottom: auto;
 }
+/* 갑옷은 몸통을 덮는 와이드 조끼 (24x12 원본의 3배) */
 .pet-sprite img.pet-equip.armor {
-  width: 32px; height: 24px;
-  left: 32px; right: auto; top: 30px; bottom: auto;
+  width: 72px; height: 36px;
+  left: 12px; right: auto; top: 20px; bottom: auto;
 }
 
 .pet-body.hurt img { filter: brightness(2.2) saturate(3); }

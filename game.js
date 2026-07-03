@@ -199,12 +199,19 @@ function applyEquipmentVisuals() {
     const img = petEquipImgs[slot.id];
     const item = EQUIPMENT.find(e => e.id === state.equipped[slot.id]);
 
-    if (item) {
-      img.src = item.sprite;
-      img.classList.add('shown');
-    } else {
-      img.classList.remove('shown');
-    }
+    if (item) img.src = item.sprite;
+    // 갑옷은 장착 즉시 표시, 검·방패는 전투 여부에 따라 매 프레임 토글
+    if (slot.id === 'armor') img.classList.toggle('shown', !!item);
+  });
+
+  updateCombatGearVisibility();
+}
+
+function updateCombatGearVisibility() {
+  const fighting = enemies.length > 0 && !isKnockedOut() && !isDancing() && !isCoding();
+
+  ['weapon', 'shield'].forEach(slotId => {
+    petEquipImgs[slotId].classList.toggle('shown', !!state.equipped[slotId] && fighting);
   });
 }
 
@@ -951,6 +958,7 @@ function loop(now) {
 
   updateMovement(dt);
   updateCombat(dt);
+  updateCombatGearVisibility();
 
   if (Date.now() - lastTickSecond >= 1000) {
     lastTickSecond = Date.now();
