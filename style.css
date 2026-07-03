@@ -73,17 +73,25 @@ html, body {
 .menu-btn {
   font-family: inherit;
   font-size: 11px;
-  background: #333;
-  color: #cccccc;
-  border: 1px solid #454545;
-  border-radius: 4px;
-  padding: 4px 10px;
+  font-weight: bold;
+  background: linear-gradient(180deg, #4c4c4f 0%, #333335 100%);
+  color: #eeeeee;
+  border: none;
+  border-radius: 7px;
+  padding: 6px 12px;
   cursor: pointer;
+  position: relative;
+  box-shadow: 0 3px 0 #19191b, 0 5px 8px rgba(0, 0, 0, .35);
+  transition: transform .08s ease, box-shadow .08s ease, background .15s ease, color .15s ease;
+  user-select: none;
 }
 .menu-btn:hover {
-  background: #3c3c3c;
-  border-color: #d97757;
-  color: #d97757;
+  background: linear-gradient(180deg, #5a5651, #3d3a36);
+  color: #ffb98c;
+}
+.menu-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 #19191b, 0 1px 2px rgba(0, 0, 0, .35);
 }
 
 /* Body layout */
@@ -455,9 +463,13 @@ html, body {
 }
 .stat-upgrade-btn.disabled:hover,
 .stat-upgrade-btn:disabled:hover {
-  background: #333;
-  border-color: #454545;
-  color: #cccccc;
+  background: linear-gradient(180deg, #4c4c4f 0%, #333335 100%);
+  color: #eeeeee;
+}
+.stat-upgrade-btn.disabled:active,
+.stat-upgrade-btn:disabled:active {
+  transform: none;
+  box-shadow: 0 3px 0 #19191b, 0 5px 8px rgba(0, 0, 0, .35);
 }
 
 /* Equipment popup */
@@ -599,14 +611,20 @@ html, body {
 .popup-close {
   font-family: inherit;
   font-size: 13px;
-  background: none;
+  font-weight: bold;
+  background: linear-gradient(180deg, #46464a, #303032);
+  color: #cfcfcf;
   border: none;
-  color: #8b8b8b;
-  padding: 2px 7px;
-  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  padding: 0;
   cursor: pointer;
+  box-shadow: 0 2px 0 #17171a, 0 3px 5px rgba(0, 0, 0, .35);
+  transition: transform .08s ease, box-shadow .08s ease, background .15s ease, color .15s ease;
 }
-.popup-close:hover { background: #3c3c3c; color: #ffffff; }
+.popup-close:hover { background: linear-gradient(180deg, #b8433f, #7a2323); color: #ffffff; }
+.popup-close:active { transform: translateY(2px); box-shadow: 0 0 0 #17171a, 0 1px 2px rgba(0, 0, 0, .35); }
 .popup-body {
   overflow-y: auto;
   min-height: 0;
@@ -869,33 +887,46 @@ html, body {
 /* --- 상점 내부 탭 (스탯 / 스킨 / 장비) --- */
 .shop-tabs {
   display: flex;
-  gap: 4px;
-  padding: 10px 20px 0;
+  gap: 6px;
+  padding: 10px 20px;
   border-bottom: 1px solid #2a2a2a;
 }
 .shop-tab {
   font-family: inherit;
   font-size: 12px;
-  background: none;
-  color: #8b8b8b;
+  font-weight: bold;
+  background: linear-gradient(180deg, #3c3c3f, #2b2b2d);
+  color: #9a9a9a;
   border: none;
-  border-bottom: 2px solid transparent;
-  padding: 8px 6px;
+  border-radius: 6px;
+  padding: 7px 14px;
   cursor: pointer;
+  box-shadow: 0 2px 0 #161618, 0 3px 5px rgba(0, 0, 0, .3);
+  transition: transform .08s ease, box-shadow .08s ease, background .15s ease, color .15s ease;
 }
 .shop-tab:hover { color: #d4d4d4; }
-.shop-tab.active { color: #d97757; border-bottom-color: #d97757; }
+.shop-tab:active { transform: translateY(2px); box-shadow: 0 0 0 #161618, 0 1px 2px rgba(0, 0, 0, .3); }
+.shop-tab.active {
+  background: linear-gradient(180deg, #e08a63, #d97757);
+  color: #1e1e1e;
+  box-shadow: 0 2px 0 #7a4020, 0 3px 5px rgba(0, 0, 0, .3), 0 0 10px rgba(217, 119, 87, .4);
+}
 .shop-tab-panel.hidden { display: none; }
 
 /* --- 세이브 / 초기화 팝업 --- */
 .save-tools-desc { color: #9a9a9a; font-size: 12px; margin: 0 0 8px; }
 .reset-tools { border-top: 1px solid #2a2a2a; margin-top: 4px; padding-top: 16px; }
-.danger-btn { border-color: #7a3030; color: #ff9a9a; }
-.danger-btn:hover { background: #3a1f1f; border-color: #e5484d; color: #ffffff; }
+.danger-btn {
+  background: linear-gradient(180deg, #5a3232, #3a1f1f);
+  color: #ff9a9a;
+  box-shadow: 0 3px 0 #260f0f, 0 5px 8px rgba(0, 0, 0, .35);
+}
+.danger-btn:hover { background: linear-gradient(180deg, #7a3a3a, #4a1f1f); color: #ffffff; }
+.danger-btn:active { box-shadow: 0 0 0 #260f0f, 0 1px 2px rgba(0, 0, 0, .35); }
 .danger-btn.danger-armed {
-  background: #4a1414;
-  border-color: #e5484d;
+  background: linear-gradient(180deg, #7a2020, #4a1414);
   color: #ffb3b3;
+  box-shadow: 0 3px 0 #260f0f, 0 5px 8px rgba(0, 0, 0, .35), 0 0 12px rgba(229, 72, 77, .5);
   animation: danger-pulse 1s ease-in-out infinite;
 }
 @keyframes danger-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
@@ -917,8 +948,13 @@ html, body {
   transition: transform .3s ease;
 }
 .version-banner.show { transform: translateY(0); }
-.version-banner .menu-btn { background: #fdeaea; color: #7a2323; border-color: #fdeaea; }
+.version-banner .menu-btn {
+  background: linear-gradient(180deg, #ffffff, #fdeaea);
+  color: #7a2323;
+  box-shadow: 0 3px 0 #c99, 0 5px 8px rgba(0, 0, 0, .25);
+}
 .version-banner .menu-btn:hover { background: #ffffff; }
+.version-banner .menu-btn:active { box-shadow: 0 0 0 #c99, 0 1px 2px rgba(0, 0, 0, .25); }
 
 /* --- 상자 (맵 스폰, 클릭 개봉) --- */
 .chest {
@@ -994,4 +1030,9 @@ html, body {
   flex-wrap: wrap;
 }
 .eq-toolbar-hint { font-size: 11px; color: #6b6b6b; }
-.menu-btn.active { background: #3a2f1a; border-color: #ffd54a; color: #ffd54a; }
+.menu-btn.active {
+  background: linear-gradient(180deg, #5a4520, #3a2f1a);
+  color: #ffd54a;
+  box-shadow: 0 3px 0 #7a5a10, 0 5px 8px rgba(0, 0, 0, .35), 0 0 10px rgba(255, 213, 74, .35);
+}
+.menu-btn.active:active { box-shadow: 0 0 0 #7a5a10, 0 1px 3px rgba(0, 0, 0, .35); }
