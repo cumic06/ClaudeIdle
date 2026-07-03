@@ -197,6 +197,8 @@ html, body {
 .pet-body.hurt img { filter: brightness(2.2) saturate(3); }
 .pet-body.ko { opacity: .45; }
 .pet-body.ko img { filter: grayscale(1); animation: none; }
+/* 부활 직후 그로기 (공격·속도 저하) */
+.pet-body.groggy img { filter: saturate(.35) brightness(.8); }
 
 .laptop {
   position: absolute;

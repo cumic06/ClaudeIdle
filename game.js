@@ -65,6 +65,8 @@ const ENEMY_ATTACK_RANGE = 66;
 const ENEMY_ATTACK_COOLDOWN = 1.2;
 const ENEMY_MOVE_SPEED = 24;
 const KO_DURATION_MS = 4000;
+const GROGGY_DURATION_MS = 8000;
+const DEATH_EXP_LOSS_RATE = 0.3;
 
 const CODING_MIN_MS = 4000;
 const CODING_MAX_MS = 8000;
@@ -753,12 +755,12 @@ function damagePet(amount, from) {
     state.curHp = 0;
     knockedOutUntil = Date.now() + KO_DURATION_MS;
     petBodyEl.classList.add('ko');
-    addLog(`💫 ${from.type.name}에게 당했다... ${KO_DURATION_MS / 1000}초 후 부활`);
+    addLog(`💀 ${from.type.name}에게 당했다... ${KO_DURATION_MS / 1000}초 후 부활`);
 
     setTimeout(() => {
       state.curHp = maxHp();
       petBodyEl.classList.remove('ko');
-      addLog('💪 부활! 다시 싸운다');
+      applyDeathPenalty();
       updateHUD();
     }, KO_DURATION_MS);
   }
@@ -768,6 +770,46 @@ function damagePet(amount, from) {
 
 function isKnockedOut() {
   return Date.now() < knockedOutUntil;
+}
+
+/* ---------- 로그라이트 사망 페널티 (EXP 손실 → 레벨 다운 가능 + 그로기) ---------- */
+
+function applyDeathPenalty() {
+  // 페널티 1: 현재 레벨 필요 EXP의 30% 손실. 부족하면 레벨 다운 + 스탯 롤백
+  const loss = Math.floor(expToNext(state.level) * DEATH_EXP_LOSS_RATE);
+  state.exp -= loss;
+
+  let leveledDown = false;
+  while (state.exp < 0 && state.level > 1) {
+    // levelUp()의 역연산
+    state.stats.hp -= 5;
+    state.stats.atk -= 1;
+    state.stats.spd -= 0.4;
+    if (state.level % 3 === 0) state.stats.luk -= 1;
+    state.level -= 1;
+    state.exp += expToNext(state.level);
+    leveledDown = true;
+  }
+  if (state.exp < 0) state.exp = 0;
+  state.curHp = Math.min(state.curHp, maxHp());
+
+  // 페널티 2: 8초간 그로기 — 공격력·이동속도 50%
+  applyBuff('atkMul', 0.5, GROGGY_DURATION_MS);
+  applyBuff('spdMul', 0.5, GROGGY_DURATION_MS);
+  petBodyEl.classList.add('groggy');
+  setTimeout(() => petBodyEl.classList.remove('groggy'), GROGGY_DURATION_MS);
+
+  floatText('💫 그로기...', petPos.x + 10, petPos.y - 24, '#a78bfa');
+
+  if (leveledDown) {
+    addLog(`💀 부활... EXP -${loss} → 레벨 하락! Lv.${state.level} · ${GROGGY_DURATION_MS / 1000}초 그로기`);
+    showToast(`부활 페널티: Lv.${state.level}로 하락!`, { icon: '💀', variant: 'rare', sub: `EXP -${loss} · ${GROGGY_DURATION_MS / 1000}초간 공격·속도 50%`, duration: 4200 });
+  } else {
+    addLog(`💀 부활... EXP -${loss} · ${GROGGY_DURATION_MS / 1000}초 그로기 (공격·속도 50%)`);
+    showToast(`부활 페널티: EXP -${loss}`, { icon: '💀', sub: `${GROGGY_DURATION_MS / 1000}초간 공격·속도 50%`, duration: 4200 });
+  }
+
+  saveState();
 }
 
 function nearestEnemy() {
@@ -794,7 +836,7 @@ function updateCombat(dt) {
 
     const critChance = 0.05 + state.stats.luk * 0.005;
     const isCrit = Math.random() < critChance;
-    let dmg = petAtk() + Math.floor(Math.random() * 3);
+    let dmg = Math.max(1, Math.round(petAtk() * buffMul('atkMul'))) + Math.floor(Math.random() * 3);
 
     if (isCrit) {
       dmg *= 2;
