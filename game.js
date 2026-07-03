@@ -120,6 +120,8 @@ const petEquipImgs = {
   armor: document.getElementById('pet-eq-armor'),
 };
 const toastStackEl = document.getElementById('toast-stack');
+const deathOverlayEl = document.getElementById('death-overlay');
+const deathTimerEl = document.getElementById('death-timer');
 const unlockOverlayEl = document.getElementById('unlock-overlay');
 const levelupFlashEl = document.getElementById('levelup-flash');
 
@@ -842,6 +844,14 @@ function isKnockedOut() {
   return Date.now() < knockedOutUntil;
 }
 
+function updateDeathOverlay() {
+  const remaining = knockedOutUntil - Date.now();
+  const show = remaining > 0;
+  deathOverlayEl.classList.toggle('show', show);
+
+  if (show) deathTimerEl.textContent = `${(remaining / 1000).toFixed(1)}초 후 부활`;
+}
+
 /* ---------- 로그라이트 사망 페널티 (EXP 손실 → 레벨 다운 가능 + 그로기) ---------- */
 
 function applyDeathPenalty() {
@@ -1179,6 +1189,7 @@ function loop(now) {
   updateMovement(dt);
   updateCombat(dt);
   updateCombatGearVisibility();
+  updateDeathOverlay();
 
   if (Date.now() - lastTickSecond >= 1000) {
     lastTickSecond = Date.now();
