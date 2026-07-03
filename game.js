@@ -48,6 +48,10 @@ const IDLE_EVENTS = [
   { msg: '🔥 야근 발생... 잠시 느려집니다', run: () => applyBuff('spdMul', 0.5, 6000) },
   { msg: '🎉 커밋 완료! 보너스 EXP 획득', run: () => gainExp(6) },
   { msg: '🚨 몬스터 무리 출현!', run: () => { spawnEnemy(); spawnEnemy(); } },
+  { msg: '🐛 버그 폭풍! 몬스터가 몰려온다', run: () => { for (let i = 0; i < 4; i++) spawnEnemy({ force: true }); } },
+  { msg: '💰 황금 몬스터 출현! 잡으면 EXP 대박', run: () => spawnEnemy({ golden: true, force: true }) },
+  { msg: '☄ 유성우가 내린다 (+10 EXP)', run: () => meteorShower() },
+  { msg: '👾 보스 몬스터 출현!!', run: () => spawnEnemy({ boss: true, force: true }) },
 ];
 
 const BUG_FRAME_WIDTH = 58;
@@ -200,18 +204,17 @@ function applyEquipmentVisuals() {
     const item = EQUIPMENT.find(e => e.id === state.equipped[slot.id]);
 
     if (item) img.src = item.sprite;
-    // 갑옷은 장착 즉시 표시, 검·방패는 전투 여부에 따라 매 프레임 토글
-    if (slot.id === 'armor') img.classList.toggle('shown', !!item);
   });
 
   updateCombatGearVisibility();
 }
 
 function updateCombatGearVisibility() {
+  // 장비는 전투 중에만 입는다 (평시·코딩·춤·KO 시 전부 해제 상태로 표시)
   const fighting = enemies.length > 0 && !isKnockedOut() && !isDancing() && !isCoding();
 
-  ['weapon', 'shield'].forEach(slotId => {
-    petEquipImgs[slotId].classList.toggle('shown', !!state.equipped[slotId] && fighting);
+  EQUIP_SLOTS.forEach(slot => {
+    petEquipImgs[slot.id].classList.toggle('shown', !!state.equipped[slot.id] && fighting);
   });
 }
 
@@ -279,15 +282,57 @@ function addLog(msg) {
   while (logEl.childElementCount > 40) logEl.removeChild(logEl.firstChild);
 }
 
-function floatText(text, x, y, color) {
+function floatText(text, x, y, color, cls) {
   const el = document.createElement('div');
-  el.className = 'float-text';
+  el.className = 'float-text' + (cls ? ` ${cls}` : '');
   el.textContent = text;
   el.style.left = x + 'px';
   el.style.top = y + 'px';
   if (color) el.style.color = color;
   stageEl.appendChild(el);
   setTimeout(() => el.remove(), 1150);
+}
+
+/* ---------- 액션 연출 (셰이크 / 파티클 / 유성우) ---------- */
+
+function shakeStage() {
+  stageEl.classList.remove('shake');
+  void stageEl.offsetWidth; // reflow → 애니메이션 재시작
+  stageEl.classList.add('shake');
+}
+
+function spawnParticles(x, y, colors, count = 10) {
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 20 + Math.random() * 34;
+    p.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+    p.style.setProperty('--dy', `${Math.sin(angle) * dist - 14}px`);
+    stageEl.appendChild(p);
+    setTimeout(() => p.remove(), 700);
+  }
+}
+
+function meteorShower() {
+  const bounds = stageEl.getBoundingClientRect();
+
+  for (let i = 0; i < 7; i++) {
+    setTimeout(() => {
+      const m = document.createElement('div');
+      m.className = 'meteor';
+      m.textContent = '☄';
+      m.style.left = (bounds.width * 0.25 + Math.random() * bounds.width * 0.7) + 'px';
+      m.style.top = (Math.random() * bounds.height * 0.3) + 'px';
+      stageEl.appendChild(m);
+      setTimeout(() => m.remove(), 1250);
+    }, i * 260);
+  }
+
+  gainExp(10);
 }
 
 /* ---------- 게임 알림 (토스트 / 레벨업 배너 / 스킨 언락 팝업) ---------- */
@@ -581,13 +626,16 @@ function pickNewTarget() {
   petTarget = { x: Math.random() * maxX, y: Math.random() * maxY };
 }
 
-function spawnEnemy() {
-  if (enemies.length >= MAX_ENEMIES) return;
+function spawnEnemy(opts = {}) {
+  if (enemies.length >= MAX_ENEMIES && !opts.force) return;
 
-  const type = ENEMY_TYPES[Math.floor(Math.random() * ENEMY_TYPES.length)];
+  // 황금/보스는 스프라이트 시트(bug) 대신 단일 타일만 사용 (틴트·확대가 깔끔함)
+  const pool = (opts.golden || opts.boss) ? ENEMY_TYPES.filter(t => t.kind === 'tile') : ENEMY_TYPES;
+  const type = pool[Math.floor(Math.random() * pool.length)];
   const bounds = stageEl.getBoundingClientRect();
-  const w = type.width || 56;
-  const h = type.height || 56;
+  const scale = opts.boss ? 1.9 : 1;
+  const w = (type.width || 56) * scale;
+  const h = (type.height || 56) * scale;
   const x = Math.random() * Math.max(20, bounds.width - w);
   const y = Math.random() * Math.max(20, bounds.height - h);
 
@@ -598,7 +646,17 @@ function spawnEnemy() {
 
   const sprite = document.createElement('div');
   sprite.className = 'enemy-sprite ' + (type.kind === 'bug' ? 'bug' : 'tile');
-  if (type.kind === 'tile') sprite.style.backgroundImage = `url("${type.sprite}")`;
+  if (type.kind === 'tile') {
+    sprite.style.backgroundImage = `url("${type.sprite}")`;
+
+    if (opts.boss) {
+      sprite.style.width = w + 'px';
+      sprite.style.height = h + 'px';
+      sprite.style.backgroundSize = `${w}px ${h}px`;
+    }
+  }
+  if (opts.golden) sprite.classList.add('golden');
+  if (opts.boss) sprite.classList.add('boss');
   wrap.appendChild(sprite);
 
   const hpbar = document.createElement('div');
@@ -610,21 +668,34 @@ function spawnEnemy() {
 
   stageEl.appendChild(wrap);
 
-  const maxHp = 8 + state.level * 3;
+  const baseHp = 8 + state.level * 3;
+  const maxHp = Math.round(baseHp * (opts.boss ? 6 : opts.golden ? 2 : 1));
   enemies.push({
     wrap, sprite, hpfill,
     x, y, w, h,
     hp: maxHp, maxHp,
-    atk: 1 + Math.floor(state.level * 0.7),
+    atk: Math.round((1 + Math.floor(state.level * 0.7)) * (opts.boss ? 1.6 : 1)),
     attackTimer: Math.random() * ENEMY_ATTACK_COOLDOWN,
+    expMul: opts.boss ? 3 : opts.golden ? 4 : 1,
+    speedMul: opts.golden ? 1.8 : opts.boss ? 0.7 : 1,
+    isBoss: !!opts.boss,
+    isGolden: !!opts.golden,
     type,
   });
+
+  if (opts.boss) shakeStage();
 }
 
-function damageEnemy(target, amount) {
+function damageEnemy(target, amount, crit = false) {
   target.hp -= amount;
   target.hpfill.style.width = `${Math.max(0, (target.hp / target.maxHp) * 100)}%`;
-  floatText(`-${amount}`, target.x + target.w / 2, target.y - 14, '#ffd54a');
+
+  if (crit) {
+    floatText(`-${amount} CRIT!`, target.x + target.w / 2, target.y - 18, '#ff9f43', 'big');
+    spawnParticles(target.x + target.w / 2, target.y + target.h / 2, ['#ff9f43', '#ffd54a'], 6);
+  } else {
+    floatText(`-${amount}`, target.x + target.w / 2, target.y - 14, '#ffd54a');
+  }
 
   target.sprite.classList.add('hit');
   setTimeout(() => target.sprite.classList.remove('hit'), 120);
@@ -632,13 +703,40 @@ function damageEnemy(target, amount) {
   if (target.hp <= 0) killEnemy(target);
 }
 
+let comboCount = 0;
+let lastKillAt = 0;
+
 function killEnemy(target) {
-  floatText(`${target.type.name} 처치!`, target.x, target.y - 26);
+  const cx = target.x + target.w / 2;
+  const cy = target.y + target.h / 2;
+  spawnParticles(cx, cy, target.isGolden
+    ? ['#ffd54a', '#fff2b0', '#f0a878']
+    : ['#ff6b6b', '#ffd54a', '#7fd88f', '#57d7f2'], target.isBoss ? 22 : 12);
+
+  if (target.isBoss) {
+    floatText(`👾 보스 ${target.type.name} 격파!!`, target.x, target.y - 30, '#ff9f43', 'big');
+    shakeStage();
+  } else {
+    floatText(`${target.type.name} 처치!`, target.x, target.y - 26);
+  }
+
   target.wrap.remove();
   enemies = enemies.filter(e => e !== target);
   state.monstersCaught += 1;
-  gainExp(3 + Math.floor(target.maxHp / 4));
-  addLog(`⚔ ${target.type.name} 처치! (총 ${state.monstersCaught}마리)`);
+
+  // 4초 안에 연속 처치하면 콤보 (보너스 EXP)
+  const now = Date.now();
+  comboCount = now - lastKillAt < 4000 ? comboCount + 1 : 1;
+  lastKillAt = now;
+  if (comboCount >= 2) floatText(`COMBO x${comboCount}!`, cx - 24, target.y - 48, '#8b6bff', 'big');
+
+  const exp = Math.floor((3 + target.maxHp / 4) * (target.expMul || 1)) + (comboCount >= 2 ? comboCount : 0);
+  gainExp(exp);
+
+  if (target.isBoss) addLog(`👾 보스 ${target.type.name} 격파!! (+${exp} EXP)`);
+  else if (target.isGolden) addLog(`💰 황금 ${target.type.name} 처치! EXP 대박 (+${exp} EXP)`);
+  else addLog(`⚔ ${target.type.name} 처치! (총 ${state.monstersCaught}마리)`);
+
   updateHUD();
 }
 
@@ -693,8 +791,17 @@ function updateCombat(dt) {
 
   if (target && dist <= PET_ATTACK_RANGE && petAttackTimer <= 0) {
     petAttackTimer = PET_ATTACK_COOLDOWN;
-    const dmg = petAtk() + Math.floor(Math.random() * 3);
-    damageEnemy(target, dmg);
+
+    const critChance = 0.05 + state.stats.luk * 0.005;
+    const isCrit = Math.random() < critChance;
+    let dmg = petAtk() + Math.floor(Math.random() * 3);
+
+    if (isCrit) {
+      dmg *= 2;
+      shakeStage();
+    }
+
+    damageEnemy(target, dmg, isCrit);
     petAnimEl.classList.add('lunge');
     setTimeout(() => petAnimEl.classList.remove('lunge'), 140);
   }
@@ -706,8 +813,9 @@ function updateCombat(dt) {
       const dirX = (petPos.x + 48) - (e.x + e.w / 2);
       const dirY = (petPos.y + 30) - (e.y + e.h / 2);
       const len = Math.hypot(dirX, dirY) || 1;
-      e.x += (dirX / len) * ENEMY_MOVE_SPEED * dt;
-      e.y += (dirY / len) * ENEMY_MOVE_SPEED * dt;
+      const speed = ENEMY_MOVE_SPEED * (e.speedMul || 1);
+      e.x += (dirX / len) * speed * dt;
+      e.y += (dirY / len) * speed * dt;
       e.wrap.style.left = e.x + 'px';
       e.wrap.style.top = e.y + 'px';
       e.sprite.style.transform = dirX < 0 ? 'scaleX(-1)' : '';
@@ -923,7 +1031,7 @@ document.addEventListener('keydown', e => {
 });
 
 function scheduleNextEvent() {
-  const delay = 12000 + Math.random() * 18000;
+  const delay = 10000 + Math.random() * 15000;
   setTimeout(() => {
     const event = IDLE_EVENTS[Math.floor(Math.random() * IDLE_EVENTS.length)];
     addLog(event.msg);

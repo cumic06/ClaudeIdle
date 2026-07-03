@@ -188,10 +188,10 @@ html, body {
   width: 28px; height: auto;
   left: -10px; right: auto; top: 20px; bottom: auto;
 }
-/* 갑옷은 몸통을 덮는 와이드 조끼 (24x12 원본의 3배) */
+/* 갑옷은 몸통 하단을 덮는 U넥 조끼 (24x10 원본의 3배) — 눈을 가리지 않게 아래로 */
 .pet-sprite img.pet-equip.armor {
-  width: 72px; height: 36px;
-  left: 12px; right: auto; top: 20px; bottom: auto;
+  width: 72px; height: 30px;
+  left: 12px; right: auto; top: 26px; bottom: auto;
 }
 
 .pet-body.hurt img { filter: brightness(2.2) saturate(3); }
@@ -256,6 +256,12 @@ html, body {
   filter: drop-shadow(0 0 3px rgba(255,80,80,.5));
   animation: enemy-bob 0.9s ease-in-out infinite;
 }
+.enemy-sprite.golden {
+  filter: sepia(1) saturate(4) hue-rotate(-18deg) brightness(1.3) drop-shadow(0 0 7px rgba(255, 213, 74, .85));
+}
+.enemy-sprite.boss {
+  filter: drop-shadow(0 0 9px rgba(255, 80, 80, .95)) drop-shadow(0 0 18px rgba(255, 120, 60, .5));
+}
 .enemy-sprite.hit { filter: brightness(2.6) drop-shadow(0 0 6px rgba(255,120,80,.9)); }
 @keyframes enemy-bob {
   0%, 100% { translate: 0 0; }
@@ -302,6 +308,47 @@ html, body {
 @keyframes float-up {
   0% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-32px); }
+}
+.float-text.big {
+  font-size: 15px;
+  font-family: "Press Start 2P", monospace;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .6);
+  z-index: 6;
+}
+
+/* ---------- 액션 연출 (셰이크 / 파티클 / 유성우) ---------- */
+.stage.shake { animation: stage-shake .3s ease; }
+@keyframes stage-shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-4px, 3px); }
+  40% { transform: translate(4px, -3px); }
+  60% { transform: translate(-3px, -2px); }
+  80% { transform: translate(2px, 3px); }
+}
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  pointer-events: none;
+  image-rendering: pixelated;
+  z-index: 5;
+  animation: particle-fly .6s ease-out forwards;
+}
+@keyframes particle-fly {
+  0% { opacity: 1; transform: translate(0, 0); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)); }
+}
+.meteor {
+  position: absolute;
+  font-size: 18px;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px rgba(255, 213, 74, .8));
+  animation: meteor-fall 1.15s linear forwards;
+}
+@keyframes meteor-fall {
+  0% { opacity: 0; transform: translate(0, 0) rotate(-36deg); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-240px, 300px) rotate(-36deg); }
 }
 
 /* HUD (compact, on growth panel) */
