@@ -10,6 +10,13 @@ function equipBonus(stat) {
   }, 0);
 }
 
+// 장비 보너스를 "+2 ATK · +15 HP" 형태의 문자열로 (상점·장비 카드 공용)
+function equipBonusText(bonus) {
+  return Object.entries(bonus)
+    .map(([k, v]) => `+${v} ${EQUIP_BONUS_LABELS[k]}`)
+    .join(' · ');
+}
+
 function maxHp() {
   return state.stats.hp + equipBonus('hp');
 }
@@ -110,53 +117,25 @@ function renderEquipmentGrid() {
     EQUIPMENT.filter(e => e.slot === slot.id).forEach(eq => {
       const unlocked = state.equipment.includes(eq.id);
       const equipped = state.equipped[slot.id] === eq.id;
+      const isGacha = eq.source === 'gacha';
 
-      const card = document.createElement('div');
-      card.className = 'acc-card' + (equipped ? ' equipped' : '') + (!unlocked ? ' locked' : '');
-
-      const preview = document.createElement('div');
-      preview.className = 'acc-preview eq-preview';
-      const img = document.createElement('img');
-      img.src = eq.sprite;
-      img.style.filter = unlocked ? '' : 'grayscale(1) brightness(.35)';
-      preview.appendChild(img);
-      card.appendChild(preview);
-
-      const name = document.createElement('div');
-      name.className = 'acc-name';
-      name.textContent = unlocked
-        ? eq.name
-        : eq.source === 'gacha'
-          ? `??? (${eq.rarity})`
-          : eq.name;
-      card.appendChild(name);
-
-      const bonusText = Object.entries(eq.bonus)
-        .map(([k, v]) => `+${v} ${EQUIP_BONUS_LABELS[k]}`)
-        .join(' · ');
-      const bonusEl = document.createElement('div');
-      bonusEl.className = 'eq-bonus';
-      bonusEl.textContent = unlocked
-        ? bonusText
-        : eq.source === 'gacha'
-          ? '상자에서만 획득'
-          : bonusText;
-      card.appendChild(bonusEl);
-
-      const status = document.createElement('div');
-      status.className = 'acc-status';
-      status.textContent = equipped
-        ? '장착중 (클릭해서 해제)'
-        : unlocked
-          ? '클릭해서 장착'
-          : eq.source === 'gacha'
-            ? '상자에서 랜덤 획득'
-            : eq.price !== undefined
-              ? `상점에서 구매 (${eq.price}🪙)`
-              : `Lv.${eq.unlockLevel} 필요`;
-      card.appendChild(status);
-
-      if (unlocked) card.addEventListener('click', () => equipItem(eq.id));
+      const card = createCard({
+        classes: (equipped ? 'equipped' : '') + (!unlocked ? ' locked' : ''),
+        previewClass: 'eq-preview',
+        previewNodes: [cardImg(eq.sprite, !unlocked)],
+        name: unlocked ? eq.name : isGacha ? `??? (${eq.rarity})` : eq.name,
+        bonus: !unlocked && isGacha ? '상자에서만 획득' : equipBonusText(eq.bonus),
+        status: equipped
+          ? '장착중 (클릭해서 해제)'
+          : unlocked
+            ? '클릭해서 장착'
+            : isGacha
+              ? '상자에서 랜덤 획득'
+              : eq.price !== undefined
+                ? `상점에서 구매 (${eq.price}🪙)`
+                : `Lv.${eq.unlockLevel} 필요`,
+        onClick: unlocked ? () => equipItem(eq.id) : undefined,
+      });
 
       grid.appendChild(card);
     });

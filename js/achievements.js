@@ -22,23 +22,13 @@ function renderAchievementGrid() {
   ACHIEVEMENTS.forEach(a => {
     const unlocked = state.achievements.includes(a.id);
 
-    const card = document.createElement('div');
-    card.className = 'acc-card no-click' + (unlocked ? ' equipped' : ' locked');
-
-    const preview = document.createElement('div');
-    preview.className = 'acc-preview achievement-preview';
-    preview.textContent = a.icon;
-    card.appendChild(preview);
-
-    const name = document.createElement('div');
-    name.className = 'acc-name';
-    name.textContent = a.name;
-    card.appendChild(name);
-
-    const status = document.createElement('div');
-    status.className = 'acc-status';
-    status.textContent = unlocked ? a.desc : `${a.desc} (미달성)`;
-    card.appendChild(status);
+    const card = createCard({
+      classes: 'no-click ' + (unlocked ? 'equipped' : 'locked'),
+      previewClass: 'achievement-preview',
+      previewText: a.icon,
+      name: a.name,
+      status: unlocked ? a.desc : `${a.desc} (미달성)`,
+    });
 
     achievementGridEl.appendChild(card);
   });

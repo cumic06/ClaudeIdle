@@ -185,6 +185,14 @@ function isKnockedOut() {
   return Date.now() < knockedOutUntil;
 }
 
+// 몬스터를 파티클과 함께 사라지게 한다 (wrap DOM만 제거 — enemies 배열 정리는 호출측 책임).
+// wrap엔 애니메이션이 없어 sprite의 enemy-bob과 충돌하지 않는다.
+function vanishEnemy(e) {
+  spawnParticles(e.x + e.w / 2, e.y + e.h / 2, ['#8b6bff', '#a78bfa', '#57d7f2'], 8);
+  e.wrap.classList.add('vanish');
+  setTimeout(() => e.wrap.remove(), 260);
+}
+
 // 쓰러지는 순간 주변 몬스터 일부가 흩어져 부활 직후 즉사 재차징을 완화한다
 function scatterEnemiesOnDeath() {
   const cx = petPos.x + 48;
@@ -198,12 +206,7 @@ function scatterEnemiesOnDeath() {
   const removeCount = Math.max(1, Math.ceil(nearby.length / 2));
   const toRemove = [...nearby].sort(() => Math.random() - 0.5).slice(0, removeCount);
 
-  toRemove.forEach(e => {
-    spawnParticles(e.x + e.w / 2, e.y + e.h / 2, ['#8b6bff', '#a78bfa', '#57d7f2'], 8);
-    e.wrap.classList.add('vanish'); // wrap엔 애니메이션이 없어 sprite의 enemy-bob과 충돌하지 않는다
-    setTimeout(() => e.wrap.remove(), 260);
-  });
-
+  toRemove.forEach(vanishEnemy);
   enemies = enemies.filter(e => !toRemove.includes(e));
   addLog(`💨 쓰러지자 주변 몬스터 ${toRemove.length}마리가 흩어졌다`);
 }

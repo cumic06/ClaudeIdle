@@ -55,48 +55,28 @@ function renderAccessoryGrid() {
     const unlocked = state.accessories.includes(acc.id);
     const equipped = state.equippedAccessory === acc.id;
 
-    const card = document.createElement('div');
-    card.className = 'acc-card' + (equipped ? ' equipped' : '') + (!unlocked ? ' locked' : '');
-
-    const preview = document.createElement('div');
-    preview.className = 'acc-preview';
-
+    const previewNodes = [];
     if (unlocked && acc.halo) {
       const glow = document.createElement('div');
       glow.className = 'halo-mini';
-      preview.appendChild(glow);
+      previewNodes.push(glow);
     }
+    previewNodes.push(cardImg(PET_SPRITE, !unlocked));
+    if (unlocked && acc.overlay) previewNodes.push(cardImg(acc.overlay));
 
-    const baseImg = document.createElement('img');
-    baseImg.src = PET_SPRITE;
-    baseImg.style.filter = unlocked ? '' : 'grayscale(1) brightness(.35)';
-    preview.appendChild(baseImg);
-
-    if (unlocked && acc.overlay) {
-      const overlayImg = document.createElement('img');
-      overlayImg.src = acc.overlay;
-      preview.appendChild(overlayImg);
-    }
-
-    card.appendChild(preview);
-
-    const name = document.createElement('div');
-    name.className = 'acc-name';
-    name.textContent = unlocked ? acc.name : acc.rare ? '??? (희귀 드랍)' : acc.name;
-    card.appendChild(name);
-
-    const status = document.createElement('div');
-    status.className = 'acc-status';
-    status.textContent = equipped
-      ? '장착중'
-      : unlocked
-        ? '클릭해서 장착'
-        : acc.rare
-          ? '레벨업 시 확률 드랍'
-          : `Lv.${acc.unlockLevel} 필요`;
-    card.appendChild(status);
-
-    if (unlocked) card.addEventListener('click', () => equipAccessory(acc.id));
+    const card = createCard({
+      classes: (equipped ? 'equipped' : '') + (!unlocked ? ' locked' : ''),
+      previewNodes,
+      name: unlocked ? acc.name : acc.rare ? '??? (희귀 드랍)' : acc.name,
+      status: equipped
+        ? '장착중'
+        : unlocked
+          ? '클릭해서 장착'
+          : acc.rare
+            ? '레벨업 시 확률 드랍'
+            : `Lv.${acc.unlockLevel} 필요`,
+      onClick: unlocked ? () => equipAccessory(acc.id) : undefined,
+    });
 
     accGridEl.appendChild(card);
   });

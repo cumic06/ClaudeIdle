@@ -8,6 +8,21 @@ function gainCoins(amount, x, y) {
   updateHUD();
 }
 
+// 코인 차감 + 구매 통계 갱신. 잔액이 부족하면 토스트만 띄우고 false를 반환한다.
+function spendCoins(price) {
+  if (state.coins < price) {
+    showToast('코인이 부족합니다', { icon: '🪙' });
+
+    return false;
+  }
+
+  state.coins -= price;
+  state.purchaseCount += 1;
+  state.totalCoinsSpent += price;
+
+  return true;
+}
+
 function healPercent(ratio) {
   const healed = Math.round(maxHp() * ratio);
   state.curHp = Math.min(maxHp(), state.curHp + healed);
@@ -19,11 +34,7 @@ function healPercent(ratio) {
 function clearAllEnemies() {
   if (!enemies.length) return;
 
-  enemies.forEach(e => {
-    spawnParticles(e.x + e.w / 2, e.y + e.h / 2, ['#8b6bff', '#a78bfa', '#57d7f2'], 8);
-    e.wrap.classList.add('vanish');
-    setTimeout(() => e.wrap.remove(), 260);
-  });
+  enemies.forEach(vanishEnemy);
 
   const cleared = enemies.length;
   enemies = [];
@@ -43,16 +54,8 @@ function applySkinVisual(skin) {
 function buySkin(id) {
   const skin = PET_SKINS.find(s => s.id === id);
   if (!skin || state.skins.includes(id)) return;
+  if (!spendCoins(skin.price)) return;
 
-  if (state.coins < skin.price) {
-    showToast('코인이 부족합니다', { icon: '🪙' });
-
-    return;
-  }
-
-  state.coins -= skin.price;
-  state.purchaseCount += 1;
-  state.totalCoinsSpent += skin.price;
   state.skins.push(id);
   state.equippedSkin = id;
   addLog(`🛒 스킨 구매: ${skin.name} (-${skin.price}🪙)`);
@@ -83,36 +86,19 @@ function renderShopGrid() {
     const equipped = state.equippedSkin === skin.id;
     const afford = !isGacha && state.coins >= skin.price;
 
-    const card = document.createElement('div');
-    card.className =
-      'acc-card' + (equipped ? ' equipped' : '') + (!owned && !afford ? ' locked' : '');
-
-    const preview = document.createElement('div');
-    preview.className = 'acc-preview';
-    const img = document.createElement('img');
-    img.src = skin.body;
-    img.style.filter = owned || !isGacha ? '' : 'grayscale(1) brightness(.35)';
-    preview.appendChild(img);
-    card.appendChild(preview);
-
-    const name = document.createElement('div');
-    name.className = 'acc-name';
-    name.textContent = owned || !isGacha ? `${skin.icon} ${skin.name}` : `??? (${skin.rarity})`;
-    card.appendChild(name);
-
-    const status = document.createElement('div');
-    status.className = 'acc-status';
-    status.textContent = equipped
-      ? '장착중'
-      : owned
-        ? '클릭해서 장착'
-        : isGacha
-          ? '상자에서 랜덤 획득'
-          : `${skin.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`;
-    card.appendChild(status);
-
-    if (owned) card.addEventListener('click', () => equipSkin(skin.id));
-    else if (afford) card.addEventListener('click', () => buySkin(skin.id));
+    const card = createCard({
+      classes: (equipped ? 'equipped' : '') + (!owned && !afford ? ' locked' : ''),
+      previewNodes: [cardImg(skin.body, isGacha && !owned)],
+      name: owned || !isGacha ? `${skin.icon} ${skin.name}` : `??? (${skin.rarity})`,
+      status: equipped
+        ? '장착중'
+        : owned
+          ? '클릭해서 장착'
+          : isGacha
+            ? '상자에서 랜덤 획득'
+            : `${skin.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`,
+      onClick: owned ? () => equipSkin(skin.id) : afford ? () => buySkin(skin.id) : undefined,
+    });
 
     shopGridEl.appendChild(card);
   });
@@ -121,16 +107,8 @@ function renderShopGrid() {
 function buyEquipment(id) {
   const item = EQUIPMENT.find(e => e.id === id);
   if (!item || item.price === undefined || state.equipment.includes(id)) return;
+  if (!spendCoins(item.price)) return;
 
-  if (state.coins < item.price) {
-    showToast('코인이 부족합니다', { icon: '🪙' });
-
-    return;
-  }
-
-  state.coins -= item.price;
-  state.purchaseCount += 1;
-  state.totalCoinsSpent += item.price;
   state.equipment.push(id);
   addLog(`🛒 장비 구매: ${item.name} (-${item.price}🪙)`);
   showToast(`${item.name} 구매 완료!`, {
@@ -153,45 +131,26 @@ function renderShopEquipGrid() {
     const equipped = state.equipped[eq.slot] === eq.id;
     const afford = state.coins >= eq.price;
 
-    const card = document.createElement('div');
-    card.className =
-      'acc-card' + (equipped ? ' equipped' : '') + (!owned && !afford ? ' locked' : '');
-
-    const preview = document.createElement('div');
-    preview.className = 'acc-preview eq-preview';
-    const img = document.createElement('img');
-    img.src = eq.sprite;
-    preview.appendChild(img);
-    card.appendChild(preview);
-
-    const name = document.createElement('div');
-    name.className = 'acc-name';
-    name.textContent = eq.name;
-    card.appendChild(name);
-
-    const bonusText = Object.entries(eq.bonus)
-      .map(([k, v]) => `+${v} ${EQUIP_BONUS_LABELS[k]}`)
-      .join(' · ');
-    const bonusEl = document.createElement('div');
-    bonusEl.className = 'eq-bonus';
-    bonusEl.textContent = bonusText;
-    card.appendChild(bonusEl);
-
-    const status = document.createElement('div');
-    status.className = 'acc-status';
-    status.textContent = owned
-      ? equipped
-        ? '장착중'
-        : '보유 중 · 클릭해서 장착'
-      : `${eq.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`;
-    card.appendChild(status);
-
-    if (owned)
-      card.addEventListener('click', () => {
-        equipItem(eq.id);
-        renderShopEquipGrid();
-      });
-    else if (afford) card.addEventListener('click', () => buyEquipment(eq.id));
+    const card = createCard({
+      classes: (equipped ? 'equipped' : '') + (!owned && !afford ? ' locked' : ''),
+      previewClass: 'eq-preview',
+      previewNodes: [cardImg(eq.sprite)],
+      name: eq.name,
+      bonus: equipBonusText(eq.bonus),
+      status: owned
+        ? equipped
+          ? '장착중'
+          : '보유 중 · 클릭해서 장착'
+        : `${eq.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`,
+      onClick: owned
+        ? () => {
+            equipItem(eq.id);
+            renderShopEquipGrid();
+          }
+        : afford
+          ? () => buyEquipment(eq.id)
+          : undefined,
+    });
 
     shopEquipGridEl.appendChild(card);
   });
@@ -218,15 +177,8 @@ function buyAutomation(id) {
     return;
   }
 
-  if (state.coins < auto.price) {
-    showToast('코인이 부족합니다', { icon: '🪙' });
+  if (!spendCoins(auto.price)) return;
 
-    return;
-  }
-
-  state.coins -= auto.price;
-  state.purchaseCount += 1;
-  state.totalCoinsSpent += auto.price;
   state.automations.push(id);
   addLog(`${auto.icon} 자동화 구매: ${auto.name} (-${auto.price}🪙)`);
   showToast(`${auto.name} 작동 시작!`, { icon: auto.icon, variant: 'gold', sub: auto.desc });
@@ -245,35 +197,19 @@ function renderAutomationGrid() {
     const unlocked = state.level >= auto.unlockLevel;
     const afford = state.coins >= auto.price;
 
-    const card = document.createElement('div');
-    card.className =
-      'acc-card' + (owned ? ' equipped' : '') + (!owned && (!unlocked || !afford) ? ' locked' : '');
-
-    const preview = document.createElement('div');
-    preview.className = 'acc-preview achievement-preview';
-    preview.textContent = auto.icon;
-    card.appendChild(preview);
-
-    const name = document.createElement('div');
-    name.className = 'acc-name';
-    name.textContent = `${auto.name}`;
-    card.appendChild(name);
-
-    const bonusEl = document.createElement('div');
-    bonusEl.className = 'eq-bonus';
-    bonusEl.textContent = auto.desc;
-    card.appendChild(bonusEl);
-
-    const status = document.createElement('div');
-    status.className = 'acc-status';
-    status.textContent = owned
-      ? '작동 중 ✓'
-      : !unlocked
-        ? `Lv.${auto.unlockLevel} 필요`
-        : `${auto.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`;
-    card.appendChild(status);
-
-    if (!owned && unlocked && afford) card.addEventListener('click', () => buyAutomation(auto.id));
+    const card = createCard({
+      classes: (owned ? 'equipped' : '') + (!owned && (!unlocked || !afford) ? ' locked' : ''),
+      previewClass: 'achievement-preview',
+      previewText: auto.icon,
+      name: auto.name,
+      bonus: auto.desc,
+      status: owned
+        ? '작동 중 ✓'
+        : !unlocked
+          ? `Lv.${auto.unlockLevel} 필요`
+          : `${auto.price}🪙 ${afford ? '· 클릭해서 구매' : '필요'}`,
+      onClick: !owned && unlocked && afford ? () => buyAutomation(auto.id) : undefined,
+    });
 
     automationGridEl.appendChild(card);
   });
@@ -284,15 +220,8 @@ function buyStatUpgrade(id) {
   const count = state.statUpgrades[id] || 0;
   const price = Math.round(def.basePrice * Math.pow(def.priceGrowth, count));
 
-  if (state.coins < price) {
-    showToast('코인이 부족합니다', { icon: '🪙' });
+  if (!spendCoins(price)) return;
 
-    return;
-  }
-
-  state.coins -= price;
-  state.purchaseCount += 1;
-  state.totalCoinsSpent += price;
   state.statUpgrades[id] = count + 1;
   state.stats[id] = Math.round((state.stats[id] + def.step) * 10) / 10;
   if (id === 'hp') state.curHp = maxHp();
