@@ -800,9 +800,12 @@ const IDLE_EVENTS = [
 ];
 
 // 손으로 다듬은 초반 업적 (이름·설명이 특별한 것들)
+// chain: 같은 계열 업적 묶음 — 업적 창에는 계열당 "현재 목표" 하나만 노출되고,
+//        달성하면 같은 자리에 다음 단계가 나타난다 (배열 순서 = 단계 순서)
 const CURATED_ACHIEVEMENTS = [
   {
     id: 'first-kill',
+    chain: 'kill',
     name: '첫 처치',
     desc: '몬스터를 처음으로 처치했다',
     icon: '⚔',
@@ -810,6 +813,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'kills-50',
+    chain: 'kill',
     name: '초보 사냥꾼',
     desc: '몬스터 50마리 처치',
     icon: '⚔',
@@ -817,6 +821,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'kills-200',
+    chain: 'kill',
     name: '베테랑 사냥꾼',
     desc: '몬스터 200마리 처치',
     icon: '⚔',
@@ -824,6 +829,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'kills-1000',
+    chain: 'kill',
     name: '전설의 사냥꾼',
     desc: '몬스터 1000마리 처치',
     icon: '⚔',
@@ -831,6 +837,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'first-boss',
+    chain: 'boss',
     name: '보스 슬레이어',
     desc: '보스 몬스터를 처음으로 처치했다',
     icon: '👾',
@@ -838,6 +845,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'boss-10',
+    chain: 'boss',
     name: '보스 헌터',
     desc: '보스 몬스터 10마리 처치',
     icon: '👾',
@@ -845,6 +853,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'first-purchase',
+    chain: 'purchase',
     name: '첫 쇼핑',
     desc: '상점에서 아이템을 처음 구매했다',
     icon: '🛒',
@@ -852,6 +861,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'spend-500',
+    chain: 'spend',
     name: '알뜰 소비',
     desc: '누적 500코인 사용',
     icon: '🪙',
@@ -859,6 +869,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'spend-3000',
+    chain: 'spend',
     name: '큰손',
     desc: '누적 3000코인 사용',
     icon: '🪙',
@@ -866,6 +877,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'first-chest',
+    chain: 'chest',
     name: '첫 상자',
     desc: '상자를 처음으로 열었다',
     icon: '🎁',
@@ -873,6 +885,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'chests-10',
+    chain: 'chest',
     name: '보물 사냥꾼',
     desc: '상자 10개 개봉',
     icon: '🎁',
@@ -880,6 +893,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'level-50',
+    chain: 'level',
     name: '중견 개발자',
     desc: '레벨 50 달성',
     icon: '⭐',
@@ -887,6 +901,7 @@ const CURATED_ACHIEVEMENTS = [
   },
   {
     id: 'level-100',
+    chain: 'level',
     name: '레전드 개발자',
     desc: '레벨 100 달성',
     icon: '⭐',
@@ -904,39 +919,40 @@ function _numLabel(n) {
 
 function _buildMilestoneAchievements() {
   const out = [];
-  const push = (id, name, desc, icon, check) => out.push({ id, name, desc, icon, check });
+  const push = (id, chain, name, desc, icon, check) =>
+    out.push({ id, chain, name, desc, icon, check });
 
   // 레벨: 110~200 (10단위) + 220~500 (20단위) → 200을 넘어도 계속 목표가 남는다
   const levels = [];
   for (let l = 110; l <= 200; l += 10) levels.push(l);
   for (let l = 220; l <= 500; l += 20) levels.push(l);
   levels.forEach(l =>
-    push(`level-${l}`, `Lv.${l} 개발자`, `레벨 ${l} 달성`, '⭐', s => s.level >= l),
+    push(`level-${l}`, 'level', `Lv.${l} 개발자`, `레벨 ${l} 달성`, '⭐', s => s.level >= l),
   );
 
   // 처치: 2천 → 100만 (지수 성장)
   [2000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000].forEach(n =>
-    push(`kills-${n}`, `${_numLabel(n)} 처치`, `몬스터 ${n.toLocaleString()}마리 처치`, '⚔', s => s.monstersCaught >= n),
+    push(`kills-${n}`, 'kill', `${_numLabel(n)} 처치`, `몬스터 ${n.toLocaleString()}마리 처치`, '⚔', s => s.monstersCaught >= n),
   );
 
   // 보스: 25 → 500
   [25, 50, 100, 250, 500].forEach(n =>
-    push(`boss-${n}`, `보스 ${n}`, `보스 몬스터 ${n}마리 처치`, '👾', s => s.bossesKilled >= n),
+    push(`boss-${n}`, 'boss', `보스 ${n}`, `보스 몬스터 ${n}마리 처치`, '👾', s => s.bossesKilled >= n),
   );
 
   // 상자: 25 → 2000
   [25, 50, 100, 250, 500, 1000, 2000].forEach(n =>
-    push(`chests-${n}`, `상자 ${_numLabel(n)}개`, `상자 ${n.toLocaleString()}개 개봉`, '🎁', s => s.chestsOpened >= n),
+    push(`chests-${n}`, 'chest', `상자 ${_numLabel(n)}개`, `상자 ${n.toLocaleString()}개 개봉`, '🎁', s => s.chestsOpened >= n),
   );
 
   // 누적 코인 사용: 1만 → 100만
   [10000, 30000, 100000, 300000, 1000000].forEach(n =>
-    push(`spend-${n}`, `${_numLabel(n)} 코인 소비`, `누적 ${n.toLocaleString()}코인 사용`, '🪙', s => s.totalCoinsSpent >= n),
+    push(`spend-${n}`, 'spend', `${_numLabel(n)} 코인 소비`, `누적 ${n.toLocaleString()}코인 사용`, '🪙', s => s.totalCoinsSpent >= n),
   );
 
-  // 플레이 시간: 5h → 200h
-  [5, 12, 24, 48, 100, 200].forEach(h =>
-    push(`play-${h}h`, `${h}시간 플레이`, `누적 ${h}시간 플레이`, '⏱', s => s.totalPlaySeconds >= h * 3600),
+  // 플레이 시간: 1h → 200h (순차 노출이라 초반 단계도 촘촘하게)
+  [1, 2, 5, 12, 24, 48, 100, 200].forEach(h =>
+    push(`play-${h}h`, 'play', `${h}시간 플레이`, `누적 ${h}시간 플레이`, '⏱', s => s.totalPlaySeconds >= h * 3600),
   );
 
   return out;
